@@ -14,9 +14,7 @@ type FileList struct {
 }
 
 func main(){
-    http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request){
-        fmt.Fprintf(w, "Hello World!")
-    })
+    http.Handle("/", http.FileServer(http.Dir("../frontend/dist")))
 
     http.HandleFunc("/getAllFiles", GetAllFilesHandler)
     http.HandleFunc("/getSong", GetSongHandler)
