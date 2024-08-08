@@ -1,3 +1,4 @@
+import { useState, useRef, useEffect } from "react";
 import styles from "./styles.module.css";
 
 const Player = ({
@@ -11,13 +12,39 @@ const Player = ({
   artist: string;
   cover: string;
 }) => {
+  const [isPlaying, setIsPlaying] = useState(true);
+
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  function handlePlayPause() {
+    audioRef.current?.paused
+      ? audioRef.current?.play()
+      : audioRef.current?.pause();
+  }
+
+  useEffect(() => {
+    if (audioRef.current) {
+      setIsPlaying(!audioRef.current.paused);
+    }
+  }, [audioRef.current?.paused]);
+
   return (
     <div className={styles.container}>
-      <h1>Music Player</h1>
-      <h2>{title}</h2>
-      <h3>{artist}</h3>
       <img src={cover} alt="cover" />
-      <audio autoPlay controls src={filePath}></audio>
+      <div className={styles.trackInfo}>
+        <h2 className={styles.title}>{title}</h2>
+        <h3 className={styles.artist}>{artist}</h3>
+      </div>
+
+      <div className={styles.controls}>
+        <button>Prev</button>
+        <button onClick={handlePlayPause}>
+          {isPlaying ? "Pause" : "Play"}
+        </button>
+        <button>Next</button>
+      </div>
+
+      <audio ref={audioRef} autoPlay src={filePath}></audio>
     </div>
   );
 };

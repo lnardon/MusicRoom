@@ -3,4 +3,46 @@
   bottom: 0rem;
   left: 0rem;
   z-index: 2;
+  width: 100%;
+  background-color: #161816;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.trackInfo {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  flex-direction: column;
+  margin-left: 2rem;
+  position: absolute;
+  left: 0;
+}
+
+.title {
+  color: #fff;
+  font-size: 1.125rem;
+  font-weight: 700;
+  margin-bottom: 0.125rem;
+}
+
+.artist {
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 400;
+  text-decoration: underline;
+  line-height: 1rem;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+}
+
+audio {
+  display: none;
 }

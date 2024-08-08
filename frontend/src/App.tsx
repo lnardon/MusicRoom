@@ -2,11 +2,20 @@
 import { useState, useEffect } from "react";
 import "./App.css";
 
+import Player from "./Components/Player";
+
 function App() {
   const [songs, setSongs] = useState([]);
   const [searchResults, setSearchResults] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+
+  const [selectedSong, setSelectedSong] = useState({
+    filePath: "",
+    title: "",
+    artist: "",
+    cover: "",
+  });
 
   useEffect(() => {
     setLoading(true);
@@ -29,14 +38,23 @@ function App() {
   }, [search]);
 
   function handleGetSong(song: any) {
-    return () => {
-      window.open(`/getSong?file=${song}`, "_blank");
-    };
+    console.log(song);
+    setSelectedSong({
+      filePath: `/getSong?file=${song}`,
+      title: song.split("/")[song.split("/").length - 1].split(".")[0],
+      artist: song.split("/")[song.split("/").length - 3],
+      cover: "https://via.placeholder.com/50",
+    });
   }
 
   return (
     <div>
-      <h1>Music Player</h1>
+      <Player
+        filePath={selectedSong.filePath}
+        title={selectedSong.title}
+        artist={selectedSong.artist}
+        cover={selectedSong.cover}
+      />
       <input
         type="text"
         value={search}
@@ -47,9 +65,19 @@ function App() {
       ) : (
         <ul>
           {searchResults.map((song: any, index: number) => (
-            <li key={index} onClick={handleGetSong(song)}>
-              {song}
-            </li>
+            <div
+              style={{
+                cursor: "pointer",
+                textAlign: "start",
+                marginBottom: "2rem",
+              }}
+              key={index}
+              onClick={() => handleGetSong(song)}
+            >
+              <div>{"-" + song.split("/").slice(5, 6)}</div>
+              <div>{"--|-- " + song.split("/").slice(6, 7)}</div>
+              <div>{"-----|----- " + song.split("/").slice(7, 8)}</div>
+            </div>
           ))}
         </ul>
       )}
