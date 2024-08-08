@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import "./App.css";
 
+import Sidebar from "./Components/SIdebar";
 import Player from "./Components/Player";
 
 function App() {
@@ -41,7 +42,7 @@ function App() {
     console.log(song);
     setSelectedSong({
       filePath: `/getSong?file=${song}`,
-      title: song.split("/")[song.split("/").length - 1].split(".")[0],
+      title: song.split("/")[song.split("/").length - 1],
       artist: song.split("/")[song.split("/").length - 3],
       cover: "https://via.placeholder.com/50",
     });
@@ -49,6 +50,7 @@ function App() {
 
   return (
     <div>
+      <Sidebar />
       <Player
         filePath={selectedSong.filePath}
         title={selectedSong.title}
@@ -74,9 +76,9 @@ function App() {
               key={index}
               onClick={() => handleGetSong(song)}
             >
-              <div>{"-" + song.split("/").slice(5, 6)}</div>
-              <div>{"--|-- " + song.split("/").slice(6, 7)}</div>
-              <div>{"-----|----- " + song.split("/").slice(7, 8)}</div>
+              <div>{"| " + song.split("/").slice(5, 6)}</div>
+              <div>{"|---- " + song.split("/").slice(6, 7)}</div>
+              <div>{"|-------- " + song.split("/").slice(7, 8)}</div>
             </div>
           ))}
         </ul>
