@@ -20,7 +20,10 @@ func main(){
     http.Handle("/", http.FileServer(http.Dir("../frontend/dist")))
 
     http.HandleFunc("/getAllFiles", GetAllFilesHandler)
+
     http.HandleFunc("/getAllArtists", GetAllArtistsHandler)
+    http.HandleFunc("/getAllAlbums", GetAllAlbumsHandler)
+
     http.HandleFunc("/getSong", GetSongHandler)
 
 
@@ -85,6 +88,43 @@ func GetAllArtistsHandler(w http.ResponseWriter, r *http.Request){
     }
 
     jsonResponse, err := json.Marshal(artistList)
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+        return
+    }
+
+    w.Header().Set("Content-Type", "application/json")
+    w.Write(jsonResponse)
+}
+
+func GetAllAlbumsHandler(w http.ResponseWriter, r *http.Request){
+    files, err := getAllFilesInPath("/media/lucas/HDD1/Music/")
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+        return
+    }
+
+    albums := make(map[string]bool)
+    for _, file := range files {
+        tag, err := id3v2.Open(file, id3v2.Options{Parse: true})
+        if err != nil {
+            log.Println("Error opening MP3 file:", err)
+            continue
+        }
+        defer tag.Close()
+
+        album := tag.Album()
+        if album != "" {
+            albums[album] = true
+        }
+    }
+
+    var albumList []string
+    for album := range albums {
+        albumList = append(albumList, album)
+    }
+
+    jsonResponse, err := json.Marshal(albumList)
     if err != nil {
         http.Error(w, err.Error(), http.StatusInternalServerError)
         return
