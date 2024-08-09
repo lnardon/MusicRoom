@@ -63,6 +63,17 @@ const Player: React.FC<PlayerProps> = ({ filePath, title, artist, cover }) => {
     }
   };
 
+  function formatTime(seconds = 0): string {
+    if (isNaN(seconds)) {
+      return "0:00";
+    }
+
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = Math.floor(seconds % 60);
+    const paddedSeconds = remainingSeconds.toString().padStart(2, "0");
+    return `${minutes}:${paddedSeconds}`;
+  }
+
   return (
     <div className={styles.container}>
       <div className={styles.trackInfo}>
@@ -108,6 +119,25 @@ const Player: React.FC<PlayerProps> = ({ filePath, title, artist, cover }) => {
           </button>
         </div>
 
+        <div
+          style={{
+            width: "100%",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            padding: "0rem 0.125rem",
+            marginBottom: "0.125rem",
+          }}
+        >
+          <span>
+            {audioRef.current
+              ? formatTime(audioRef.current.currentTime)
+              : "0:00"}
+          </span>
+          <span>
+            {audioRef.current ? formatTime(audioRef.current.duration) : "0:00"}
+          </span>
+        </div>
         <div className={styles.timeline} onClick={handleTimelineClick}>
           <div className={styles.progress}>
             <div className={styles.bar}>
