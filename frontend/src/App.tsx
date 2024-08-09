@@ -39,12 +39,11 @@ function App() {
   }, [search]);
 
   function handleGetSong(song: any) {
-    console.log(song);
     setSelectedSong({
       filePath: `/getSong?file=${song}`,
       title: song.split("/")[song.split("/").length - 1],
       artist: song.split("/")[song.split("/").length - 3],
-      cover: "https://via.placeholder.com/50",
+      cover: `/getCover?file=${song}`,
     });
   }
 

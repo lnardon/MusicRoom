@@ -109,16 +109,20 @@ const Player: React.FC<PlayerProps> = ({ filePath, title, artist, cover }) => {
         </div>
 
         <div className={styles.timeline} onClick={handleTimelineClick}>
-          <div className={styles.progress} style={{ width: `${progress}%` }}>
+          <div className={styles.progress}>
             <div className={styles.bar}>
               <div
                 className={styles.fill}
                 style={{
                   width: `${progress}%`,
                 }}
-              >
-                <div className={styles.handle}></div>
-              </div>
+              ></div>
+              <div
+                className={styles.handle}
+                style={{
+                  left: `calc(${progress}% - 0.5rem)`,
+                }}
+              ></div>
             </div>
           </div>
         </div>

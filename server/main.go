@@ -25,6 +25,7 @@ func main(){
     http.HandleFunc("/getAllAlbums", GetAllAlbumsHandler)
 
     http.HandleFunc("/getSong", GetSongHandler)
+    http.HandleFunc("/getCover", GetCoverHandler)
 
 
     PORT := ":7777"
@@ -150,5 +151,56 @@ func getAllFilesInPath(path string) ([]string, error) {
 
 func GetSongHandler(w http.ResponseWriter, r *http.Request){
     file := r.URL.Query().Get("file")
+    
+    coverURL := GetCover(file)
+    w.Header().Set("Cover-URL", coverURL)
     http.ServeFile(w, r, file)
+}
+
+func GetCoverHandler(w http.ResponseWriter, r *http.Request){
+    file := r.URL.Query().Get("file")
+    tag, err := id3v2.Open(file, id3v2.Options{Parse: true})
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+        return
+    }
+
+    frames := tag.GetFrames(tag.CommonID("Attached picture"))
+    for _, f := range frames {
+        pic, ok := f.(id3v2.PictureFrame)
+        if ok {
+            w.Header().Set("Content-Type", "image/jpeg")
+            w.Write(pic.Picture)
+            return
+        }
+    }
+}
+
+func GetCover(path string) string{
+	files, err := getAllFilesInPath(path)
+	if err != nil {
+		log.Fatalf("Error fetching files: %v", err)
+	}
+
+	for _, file := range files {
+		tag, err := id3v2.Open(file, id3v2.Options{Parse: true})
+		if err != nil {
+			log.Printf("Error opening file %s: %v", file, err)
+			continue
+		}
+
+		frames := tag.GetFrames(tag.CommonID("Attached picture"))
+		for _, f := range frames {
+			pic, ok := f.(id3v2.PictureFrame)
+			if ok {
+				filename := fmt.Sprintf("./album_covers/cover_%s.jpg", tag.Album())
+				if err := os.WriteFile(filename, pic.Picture, 0644); err != nil {
+					log.Printf("Error saving file %s: %v", filename, err)
+					continue
+				}
+                return fmt.Sprintf("/album_covers/%s", filename)
+			}
+		}
+	}
+    return ""
 }
