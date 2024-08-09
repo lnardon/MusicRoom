@@ -1,7 +1,11 @@
-import { Home, Search, Settings, BarChart2 } from "lucide-react";
+import { Home, Search, Settings, BarChart2, ListMusicIcon } from "lucide-react";
 import styles from "./styles.module.css";
 
-const SIdebar: React.FC = () => {
+const SIdebar = ({
+  setCurrentView,
+}: {
+  setCurrentView: (view: string) => void;
+}) => {
   return (
     <div className={styles.container}>
       <h1
@@ -11,16 +15,27 @@ const SIdebar: React.FC = () => {
       >
         MusiCO
       </h1>
-      <div className={styles.button}>
+      <div className={styles.button} onClick={() => setCurrentView("home")}>
         <Home size={22} />
         <span className={styles.text} style={{ fontSize: "1rem" }}>
           Home
         </span>
       </div>
-      <div className={styles.button}>
+      <div className={styles.button} onClick={() => setCurrentView("search")}>
         <Search size={22} />
         <span className={styles.text} style={{ fontSize: "1rem" }}>
           Search
+        </span>
+      </div>
+      <div
+        className={styles.button}
+        style={{
+          opacity: 0.3,
+        }}
+      >
+        <ListMusicIcon size={22} />
+        <span className={styles.text} style={{ fontSize: "1rem" }}>
+          Playlist
         </span>
       </div>
       <div
