@@ -1,9 +1,16 @@
 import React from "react";
 
+// import ArtistProfile from "../ArtistProfile";
+import Album from "../Album";
+
 const Home: React.FC = () => {
   return (
-    <div>
-      <h1>Home</h1>
+    <div
+      style={{
+        width: "100%",
+      }}
+    >
+      <Album />
     </div>
   );
 };

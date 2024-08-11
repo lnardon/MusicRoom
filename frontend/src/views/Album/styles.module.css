@@ -1,0 +1,84 @@
+.container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem;
+  height: calc(100vh - 6rem);
+  overflow-y: scroll;
+}
+
+.header {
+  width: 100%;
+  background-color: #42424242;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  border-radius: 1rem;
+  padding: 2rem;
+  margin-bottom: 2rem;
+}
+
+.cover {
+  width: 16rem;
+  height: 16rem;
+  border-radius: 0.5rem;
+  box-shadow: 0rem 0rem 0.5rem 0.25rem rgba(222, 222, 222, 0.08);
+  margin-right: 2rem;
+}
+
+.headerText {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.name {
+  font-size: 4rem;
+  font-weight: 900;
+  line-height: 5rem;
+  text-align: start;
+}
+
+.artist {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  font-weight: 500;
+}
+
+.tracklist {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  text-align: start;
+}
+
+.track {
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  /* border: 1px solid #d4d4d421; */
+  border-radius: 0.25rem;
+  margin-bottom: 0.125rem;
+  padding: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  gap: 2rem;
+}
+
+.track:hover {
+  background-color: #d4d4d421;
+}
+
+.track > span {
+  font-size: 1rem;
+  font-weight: 400;
+  text-align: start;
+  width: 100%;
+  display: flex;
+  flex: 1;
+}
