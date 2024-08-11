@@ -24,6 +24,7 @@ func main(){
     http.HandleFunc("/getAllArtists", GetAllArtistsHandler)
     http.HandleFunc("/getAllAlbums", GetAllAlbumsHandler)
 
+    http.HandleFunc("/getAlbum", GetAlbumHandler)
     http.HandleFunc("/getSong", GetSongHandler)
     http.HandleFunc("/getCover", GetCoverHandler)
 
@@ -203,4 +204,37 @@ func GetCover(path string) string{
 		}
 	}
     return ""
+}
+
+func GetAlbumHandler(w http.ResponseWriter, r *http.Request){
+    album := r.URL.Query().Get("album")
+
+    files, err := getAllFilesInPath("/media/lucas/HDD1/Music/")
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+        return
+    }
+
+    var songs []string
+    for _, file := range files {
+        tag, err := id3v2.Open(file, id3v2.Options{Parse: true})
+        if err != nil {
+            log.Println("Error opening MP3 file:", err)
+            continue
+        }
+        defer tag.Close()
+
+        if tag.Album() == album {
+            songs = append(songs, file)
+        }
+    }
+
+    jsonResponse, err := json.Marshal(songs)
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+        return
+    }
+
+    w.Header().Set("Content-Type", "application/json")
+    w.Write(jsonResponse)
 }
