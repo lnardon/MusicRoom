@@ -7,13 +7,7 @@ import Search from "./views/Search";
 import Home from "./views/Home";
 
 function App() {
-  const [currentView, setCurrentView] = useState("search");
-  const [selectedSong, setSelectedSong] = useState({
-    filePath: "",
-    title: "",
-    artist: "",
-    cover: "",
-  });
+  const [currentView, setCurrentView] = useState("");
 
   return (
     <div>
@@ -25,18 +19,9 @@ function App() {
         }}
       >
         <Sidebar setCurrentView={setCurrentView} />
-        {currentView === "search" ? (
-          <Search setSelectedSong={setSelectedSong} />
-        ) : (
-          <Home />
-        )}
+        {currentView === "search" ? <Search /> : <Home />}
       </div>
-      <Player
-        filePath={selectedSong.filePath}
-        title={selectedSong.title}
-        artist={selectedSong.artist}
-        cover={selectedSong.cover}
-      />
+      <Player />
     </div>
   );
 }

@@ -1,18 +1,15 @@
 import { useState, useRef, useEffect } from "react";
 import AnimatedText from "animated-text-letters";
 import { Play, Pause, Repeat2, Dices } from "lucide-react";
+import { usePlayerStore } from "../../stores/playerStore";
+
 import "animated-text-letters/index.css";
 import styles from "./styles.module.css";
 
-type PlayerProps = {
-  filePath: string;
-  title: string;
-  artist: string;
-  cover: string;
-};
+const Player: React.FC = () => {
+  const { cover, filePath, title, artist, isPlaying, setIsPlaying } =
+    usePlayerStore();
 
-const Player: React.FC<PlayerProps> = ({ filePath, title, artist, cover }) => {
-  const [isPlaying, setIsPlaying] = useState<boolean>(true);
   const [progress, setProgress] = useState<number>(0);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
@@ -107,15 +104,15 @@ const Player: React.FC<PlayerProps> = ({ filePath, title, artist, cover }) => {
       <div>
         <div className={styles.controls}>
           <button>
-            <Repeat2 />
+            <Repeat2 size={20} />
           </button>
           <button>Prev</button>
           <button onClick={handlePlayPause}>
-            {isPlaying ? <Pause /> : <Play />}
+            {isPlaying ? <Pause size={28} /> : <Play size={28} />}
           </button>
           <button>Next</button>
           <button>
-            <Dices />
+            <Dices size={20} />
           </button>
         </div>
 
@@ -126,7 +123,9 @@ const Player: React.FC<PlayerProps> = ({ filePath, title, artist, cover }) => {
             justifyContent: "space-between",
             alignItems: "center",
             padding: "0rem 0.125rem",
-            marginBottom: "0.125rem",
+            marginBottom: "0.25rem",
+            fontSize: "0.8rem",
+            color: "rgba(255, 255, 255, 0.8)",
           }}
         >
           <span>

@@ -1,12 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
-// import { Container } from './styles';
+import { usePlayerStore } from "../stores/playerStore";
 
-const Home = ({
-  setSelectedSong,
-}: {
-  setSelectedSong: (song: any) => void;
-}) => {
+const Home = () => {
   const [songs, setSongs] = useState([]);
   const [searchResults, setSearchResults] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -33,11 +29,12 @@ const Home = ({
   }, [search]);
 
   function handleGetSong(song: any) {
-    setSelectedSong({
+    usePlayerStore.setState({
       filePath: `/getSong?file=${song}`,
       title: song.split("/")[song.split("/").length - 1],
       artist: song.split("/")[song.split("/").length - 3],
       cover: `/getCover?file=${song}`,
+      isPlaying: true,
     });
   }
 
@@ -48,8 +45,8 @@ const Home = ({
         flexDirection: "column",
         alignItems: "flex-start",
         width: "100%",
-        height: "100vh",
-        padding: "2rem",
+        height: "calc(100vh - 6rem)",
+        padding: "2rem 0rem",
         overflowY: "scroll",
       }}
     >
@@ -64,8 +61,7 @@ const Home = ({
         <ul
           style={{
             width: "100%",
-            height: "calc(100vh - 16rem)",
-            marginBottom: "6rem",
+            padding: "4rem",
           }}
         >
           {searchResults.map((song: any, index: number) => (

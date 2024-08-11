@@ -5,10 +5,17 @@ interface PlayerState {
   filePath: string;
   title: string;
   artist: string;
+  setCover: (cover: string) => void;
+  setFilePath: (filePath: string) => void;
+  setTitle: (title: string) => void;
+  setArtist: (artist: string) => void;
 
   isPlaying: boolean;
   isShuffled: boolean;
   isRepeating: boolean;
+  setIsPlaying: (isPlaying: boolean) => void;
+  setIsShuffled: (isShuffled: boolean) => void;
+  setIsRepeating: (isRepeating: boolean) => void;
 }
 
 export const usePlayerStore = create<PlayerState>()((set) => ({
