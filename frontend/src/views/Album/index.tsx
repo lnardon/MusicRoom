@@ -1,89 +1,61 @@
 import { useState, useEffect } from "react";
 import { usePlayerStore } from "../../stores/playerStore";
+import { useUrlStore } from "../../stores/urlStore";
 
 import styles from "./styles.module.css";
 
 const Album: React.FC = () => {
-  const [name, setName] = useState("The Off-Season");
+  const [name, setName] = useState(
+    new URLSearchParams(window.location.search).get("album")
+  );
+  const [artist, setArtist2] = useState(
+    new URLSearchParams(window.location.search).get("artist")
+  );
+  const [cover, setCover2] = useState("");
   const [tracks, setTracks] = useState([
     {
-      title: "95 South",
-      album: "The Off-Season",
-      duration: "3:12",
-    },
-    {
-      title: "Amari",
-      album: "The Off-Season",
-      duration: "2:28",
-    },
-    {
-      title: "My Life",
-      album: "The Off-Season",
-      duration: "3:38",
-    },
-    {
-      title: "Applying Pressure",
-      album: "The Off-Season",
-      duration: "2:57",
-    },
-    {
-      title: "Punchin' the Clock",
-      album: "The Off-Season",
-      duration: "2:57",
-    },
-    {
-      title: "100 Mil",
-      album: "The Off-Season",
+      title: "State of the Art",
+      cover: "",
+      album: "Sleep Is the Cousin of Death",
       duration: "2:45",
     },
-    {
-      title: "Pride is the Devil",
-      album: "The Off-Season",
-      duration: "3:38",
-    },
-    {
-      title: "Let Go My Hand",
-      album: "The Off-Season",
-      duration: "4:35",
-    },
-    {
-      title: "Interlude",
-      album: "The Off-Season",
-      duration: "1:55",
-    },
-    {
-      title: "The Climb Back",
-      album: "The Off-Season",
-      duration: "5:06",
-    },
-    {
-      title: "Close",
-      album: "The Off-Season",
-      duration: "3:21",
-    },
   ]);
-  const { setFilePath, setTitle, setArtist, setCover, setIsPlaying } =
+  const { setFilePath, setTitle, setCover, setArtist, setIsPlaying } =
     usePlayerStore();
+  const setUrl = useUrlStore((state) => state.setUrl);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   function handlePlay(track: any) {
-    console.log(track);
-    setFilePath(`/getSong?file=${track.title}`);
+    setFilePath(
+      `/getSong?file=/media/lucas/HDD1/Music/${artist?.split("/")[0]}/${name}/${
+        track.title
+      }.mp3`
+    );
     setTitle(track.title);
-    setArtist("J.Cole");
-    setCover(`/getCover?file=${track.title}`);
+    setArtist(artist || "");
+    setCover(
+      `/getCover?file=/media/lucas/HDD1/Music/${
+        artist?.split("/")[0]
+      }/${name}/${track.title}.mp3`
+    );
     setIsPlaying(true);
   }
 
   useEffect(() => {
-    document.title = "Album - The Off-Season";
-    fetch("/getAlbum?album=The Off-Season")
+    document.title = name || "Album";
+    fetch(`/getAlbum?album=${name}`)
       .then((res) => res.json())
       .then((data) => {
-        setName(data.name);
-        setTracks(data.tracks);
+        setName(data[0].album);
+        setArtist2(data[0].artist);
+        setCover2(
+          `/getCover?file=/media/lucas/HDD1/Music/${
+            data[0].artist.split("/")[0]
+          }/${data[0].album}/${data[0].title}.mp3`
+        );
+        setTracks(data);
       });
-  }, []);
+  }, [name]);
 
   return (
     <div className={styles.container}>
@@ -93,11 +65,7 @@ const Album: React.FC = () => {
           backgroundColor: "rgba(0, 0, 0, 0.64)",
         }}
       >
-        <img
-          className={styles.cover}
-          src={`/getCover/getCover?file=${tracks[0].title}`}
-          alt="cover image"
-        />
+        <img className={styles.cover} src={cover} alt="cover image" />
         <div className={styles.headerText}>
           <h1 className={styles.name}>{name}</h1>
           <h2 className={styles.artist}>
@@ -110,7 +78,28 @@ const Album: React.FC = () => {
             >
               by
             </span>
-            <span>J.Cole</span>
+            <span
+              style={{
+                cursor: "pointer",
+                color: "white",
+                textDecoration: "underline",
+              }}
+              onClick={() => {
+                const searchParams = new URLSearchParams(
+                  window.location.search
+                );
+                searchParams.set("artist", artist || "");
+                searchParams.set("view", "artist_profile");
+                window.history.pushState(
+                  {},
+                  "",
+                  `${window.location.pathname}?${searchParams.toString()}`
+                );
+                setUrl(window.location.search);
+              }}
+            >
+              {artist}
+            </span>
           </h2>
         </div>
       </div>
@@ -132,7 +121,13 @@ const Album: React.FC = () => {
               key={index}
               onClick={() => handlePlay(track)}
             >
-              <span>{index + 1}</span>
+              <span
+                style={{
+                  width: "2rem",
+                }}
+              >
+                {index + 1}
+              </span>
               <span className={styles.title}>{track.title}</span>
               <span>{track.album}</span>
               <span className={styles.duration}>{track.duration}</span>

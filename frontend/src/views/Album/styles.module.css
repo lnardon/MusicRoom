@@ -23,7 +23,7 @@
   width: 16rem;
   height: 16rem;
   border-radius: 0.5rem;
-  box-shadow: 0rem 0rem 0.5rem 0.25rem rgba(222, 222, 222, 0.08);
+  box-shadow: 0rem 0rem 1rem 0.25rem rgba(222, 222, 222, 0.16);
   margin-right: 2rem;
 }
 
@@ -46,7 +46,8 @@
   flex-direction: column;
   justify-content: center;
   align-items: flex-start;
-  font-weight: 500;
+  font-weight: 400;
+  font-size: 0.96rem;
 }
 
 .tracklist {
