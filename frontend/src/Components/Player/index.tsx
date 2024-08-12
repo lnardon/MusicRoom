@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import AnimatedText from "animated-text-letters";
 import { Play, Pause, Repeat2, Dices } from "lucide-react";
 import { usePlayerStore } from "../../stores/playerStore";
+import { useUrlStore } from "../../stores/urlStore";
 
 import "animated-text-letters/index.css";
 import styles from "./styles.module.css";
@@ -9,6 +10,7 @@ import styles from "./styles.module.css";
 const Player: React.FC = () => {
   const { cover, filePath, title, artist, isPlaying, setIsPlaying } =
     usePlayerStore();
+  const setUrl = useUrlStore((state) => state.setUrl);
 
   const [progress, setProgress] = useState<number>(0);
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -71,11 +73,23 @@ const Player: React.FC = () => {
     return `${minutes}:${paddedSeconds}`;
   }
 
+  function handleClick(artist: string) {
+    const searchParams = new URLSearchParams(window.location.search);
+    searchParams.set("artist", artist);
+    searchParams.set("view", "artist_profile");
+    window.history.pushState(
+      {},
+      "",
+      `${window.location.pathname}?${searchParams.toString()}`
+    );
+    setUrl(window.location.search);
+  }
+
   return (
     <div className={styles.container}>
       <div className={styles.trackInfo}>
         {cover !== "" && (
-          <img src={cover} alt={title} className={styles.cover} />
+          <img key={cover} src={cover} alt={title} className={styles.cover} />
         )}
         <div className={styles.text}>
           <span className={styles.title}>
@@ -88,7 +102,7 @@ const Player: React.FC = () => {
               animationDuration={800}
             />
           </span>
-          <span className={styles.artist}>
+          <span className={styles.artist} onClick={() => handleClick(artist)}>
             <AnimatedText
               text={artist}
               animation="slide-up"
