@@ -5,9 +5,7 @@ import { useUrlStore } from "../../stores/urlStore";
 import styles from "./styles.module.css";
 
 const Album: React.FC = () => {
-  const [name, setName] = useState(
-    new URLSearchParams(window.location.search).get("album")
-  );
+  const name = new URLSearchParams(window.location.search).get("album");
   const [artist, setArtist2] = useState(
     new URLSearchParams(window.location.search).get("artist")
   );
@@ -26,18 +24,10 @@ const Album: React.FC = () => {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   function handlePlay(track: any) {
-    setFilePath(
-      `/getSong?file=/media/lucas/HDD1/Music/${artist?.split("/")[0]}/${name}/${
-        track.title
-      }.mp3`
-    );
+    setFilePath(`/getSong?file=${track.id}`);
     setTitle(track.title);
     setArtist(artist || "");
-    setCover(
-      `/getCover?file=/media/lucas/HDD1/Music/${
-        artist?.split("/")[0]
-      }/${name}/${track.title}.mp3`
-    );
+    setCover(`/getCover?file=${name}`);
     setIsPlaying(true);
   }
 
@@ -46,16 +36,11 @@ const Album: React.FC = () => {
     fetch(`/getAlbum?album=${name}`)
       .then((res) => res.json())
       .then((data) => {
-        setName(data[0].album);
         setArtist2(data[0].artist);
-        setCover2(
-          `/getCover?file=/media/lucas/HDD1/Music/${
-            data[0].artist.split("/")[0]
-          }/${data[0].album}/${data[0].title}.mp3`
-        );
+        setCover2(`getCover?file=${name}`);
         setTracks(data);
       });
-  }, [name]);
+  }, [name, setArtist, setCover2, setTracks]);
 
   return (
     <div className={styles.container}>
