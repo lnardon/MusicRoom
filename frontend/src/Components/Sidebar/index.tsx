@@ -1,7 +1,7 @@
 import { Home, Search, Settings, BarChart2, ListMusicIcon } from "lucide-react";
 import styles from "./styles.module.css";
 
-const SIdebar = ({
+const Sidebar = ({
   setCurrentView,
 }: {
   setCurrentView: (view: string) => void;
@@ -64,4 +64,4 @@ const SIdebar = ({
   );
 };
 
-export default SIdebar;
+export default Sidebar;
