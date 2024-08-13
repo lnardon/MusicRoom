@@ -52,6 +52,7 @@ const ArtistProfile: React.FC = () => {
             display: "flex",
             justifyContent: "flex-start",
             width: "100%",
+            flexWrap: "wrap",
           }}
         >
           {info.albums.map((album: any, index: any) => (
@@ -61,12 +62,15 @@ const ArtistProfile: React.FC = () => {
               style={{
                 display: "flex",
                 flexDirection: "column",
-                justifyContent: "center",
-                alignItems: "center",
-                height: "100px",
-                width: "200px",
+                alignItems: "flex-start",
+                justifyContent: "flex-start",
+                width: "12rem",
                 margin: "0.5rem",
                 backgroundColor: "rgba(0, 0, 0, 0.64)",
+                padding: "0.5rem",
+                borderRadius: "0.5rem",
+                cursor: "pointer",
+                animationDelay: `${index * 0.08}s`,
               }}
               onClick={() => {
                 handleClick(album);
@@ -76,8 +80,9 @@ const ArtistProfile: React.FC = () => {
                 src={`/getCover?file=${album}`}
                 alt="cover image"
                 style={{
-                  height: "100px",
-                  width: "100px",
+                  width: "100%",
+                  borderRadius: "0.5rem",
+                  marginBottom: "0.5rem",
                 }}
               />
               <h4>{album}</h4>

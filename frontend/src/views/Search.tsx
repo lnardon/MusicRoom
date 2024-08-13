@@ -46,10 +46,11 @@ const Home = () => {
         alignItems: "flex-start",
         width: "100%",
         height: "calc(100vh - 6rem)",
-        padding: "2rem 0rem",
         overflowY: "scroll",
+        padding: "2rem",
       }}
     >
+      <h1>Search</h1>
       <input
         type="text"
         value={search}
@@ -61,7 +62,6 @@ const Home = () => {
         <ul
           style={{
             width: "100%",
-            padding: "4rem",
           }}
         >
           {searchResults.map((song: any, index: number) => (
