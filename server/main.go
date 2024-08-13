@@ -24,6 +24,7 @@ func main(){
     http.HandleFunc("/getAllArtists", GetAllArtistsHandler)
     http.HandleFunc("/getAllAlbums", GetAllAlbumsHandler)
 
+    http.HandleFunc("/getArtist", GetArtistHandler)
     http.HandleFunc("/getAlbum", GetAlbumHandler)
     http.HandleFunc("/getSong", GetSongHandler)
     http.HandleFunc("/getCover", GetCoverHandler)
@@ -206,6 +207,13 @@ func GetCover(path string) string{
     return ""
 }
 
+type Song struct {
+    Title string `json:"title"`
+    Artist string `json:"artist"`
+    Album string `json:"album"`
+    File string `json:"file"`
+}
+
 func GetAlbumHandler(w http.ResponseWriter, r *http.Request){
     album := r.URL.Query().Get("album")
 
@@ -215,7 +223,7 @@ func GetAlbumHandler(w http.ResponseWriter, r *http.Request){
         return
     }
 
-    var songs []string
+    var songs []Song
     for _, file := range files {
         tag, err := id3v2.Open(file, id3v2.Options{Parse: true})
         if err != nil {
@@ -225,11 +233,77 @@ func GetAlbumHandler(w http.ResponseWriter, r *http.Request){
         defer tag.Close()
 
         if tag.Album() == album {
-            songs = append(songs, file)
+            songs = append(songs, Song{
+                Title: tag.Title(),
+                Artist: tag.Artist(),
+                Album: tag.Album(),
+                File: file,
+            })
         }
     }
 
     jsonResponse, err := json.Marshal(songs)
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+        return
+    }
+
+    w.Header().Set("Content-Type", "application/json")
+    w.Write(jsonResponse)
+}
+
+type ArtistInfo struct {
+    Artist string   `json:"artist"`
+    Albums []string `json:"albums"`
+    Songs  []Song   `json:"songs"`
+}
+
+func GetArtistHandler(w http.ResponseWriter, r *http.Request) {
+    artist := r.URL.Query().Get("artist")
+
+    files, err := getAllFilesInPath(fmt.Sprint("/media/lucas/HDD1/Music/", artist))
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+        return
+    }
+
+    var songs []Song
+    albumSet := make(map[string]bool)
+    for _, file := range files {
+        tag, err := id3v2.Open(file, id3v2.Options{Parse: true})
+        if err != nil {
+            log.Println("Error opening MP3 file:", err)
+            continue
+        }
+        defer tag.Close()
+
+        allSongsArtists := strings.Split(tag.Artist(), "/")
+        for _, songArtist := range allSongsArtists {
+            if songArtist == artist {
+                song := Song{
+                    Title:  tag.Title(),
+                    Artist: tag.Artist(),
+                    Album:  tag.Album(),
+                    File:   file,
+                }
+                songs = append(songs, song)
+                albumSet[song.Album] = true
+            }
+        }
+    }
+
+    albums := make([]string, 0, len(albumSet))
+    for album := range albumSet {
+        albums = append(albums, album)
+    }
+
+    artistInfo := ArtistInfo{
+        Artist: artist,
+        Albums: albums,
+        Songs:  songs,
+    }
+
+    jsonResponse, err := json.Marshal(artistInfo)
     if err != nil {
         http.Error(w, err.Error(), http.StatusInternalServerError)
         return
