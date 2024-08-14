@@ -1,6 +1,13 @@
 import { useState, useRef, useEffect } from "react";
 import AnimatedText from "animated-text-letters";
-import { Play, Pause, Repeat2, Dices } from "lucide-react";
+import {
+  Play,
+  Pause,
+  Repeat2,
+  Dices,
+  SkipForward,
+  SkipBack,
+} from "lucide-react";
 import { usePlayerStore } from "../../stores/playerStore";
 import { useUrlStore } from "../../stores/urlStore";
 
@@ -8,8 +15,18 @@ import "animated-text-letters/index.css";
 import styles from "./styles.module.css";
 
 const Player: React.FC = () => {
-  const { cover, filePath, title, artist, isPlaying, setIsPlaying } =
-    usePlayerStore();
+  const {
+    cover,
+    filePath,
+    title,
+    artist,
+    isPlaying,
+    setIsPlaying,
+    isRepeating,
+    isShuffled,
+    setIsRepeating,
+    setIsShuffled,
+  } = usePlayerStore();
   const setUrl = useUrlStore((state) => state.setUrl);
 
   const [progress, setProgress] = useState<number>(0);
@@ -118,15 +135,27 @@ const Player: React.FC = () => {
       <div>
         <div className={styles.controls}>
           <button>
-            <Repeat2 size={20} />
+            <Repeat2
+              size={20}
+              color={isRepeating ? "#ffd000" : "rgba(255, 255, 255, 0.4)"}
+              onClick={() => setIsRepeating(!isRepeating)}
+            />
           </button>
-          <button>Prev</button>
+          <button>
+            <SkipBack />
+          </button>
           <button onClick={handlePlayPause}>
             {isPlaying ? <Pause size={28} /> : <Play size={28} />}
           </button>
-          <button>Next</button>
           <button>
-            <Dices size={20} />
+            <SkipForward />
+          </button>
+          <button>
+            <Dices
+              size={20}
+              color={isShuffled ? "#ffd000" : "rgba(255, 255, 255, 0.4)"}
+              onClick={() => setIsShuffled(!isShuffled)}
+            />
           </button>
         </div>
 
