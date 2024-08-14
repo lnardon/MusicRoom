@@ -18,16 +18,17 @@ const Album: React.FC = () => {
       duration: "2:45",
     },
   ]);
-  const { setFilePath, setTitle, setCover, setArtist, setIsPlaying } =
-    usePlayerStore();
+  const { setSong, setIsPlaying } = usePlayerStore();
   const setUrl = useUrlStore((state) => state.setUrl);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   function handlePlay(track: any) {
-    setFilePath(`/getSong?file=${track.id}`);
-    setTitle(track.title);
-    setArtist(artist || "");
-    setCover(`/getCover?file=${name}`);
+    setSong({
+      title: track.title,
+      artist: artist || "",
+      cover: cover,
+      file: `/getSong?file=${track.id}`,
+    });
     setIsPlaying(true);
   }
 
@@ -40,7 +41,7 @@ const Album: React.FC = () => {
         setCover2(`getCover?file=${name}`);
         setTracks(data.songs);
       });
-  }, [name, setArtist, setCover2, setTracks]);
+  }, [name, setCover2, setTracks]);
 
   return (
     <div className={styles.container}>

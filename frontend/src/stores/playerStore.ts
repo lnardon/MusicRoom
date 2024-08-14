@@ -1,14 +1,14 @@
 import { create } from "zustand";
 
-interface PlayerState {
+interface Song {
   cover: string;
-  filePath: string;
+  file: string;
   title: string;
   artist: string;
-  setCover: (cover: string) => void;
-  setFilePath: (filePath: string) => void;
-  setTitle: (title: string) => void;
-  setArtist: (artist: string) => void;
+}
+interface PlayerState {
+  song: Song;
+  setSong: (song: Song) => void;
 
   isPlaying: boolean;
   isShuffled: boolean;
@@ -19,14 +19,13 @@ interface PlayerState {
 }
 
 export const usePlayerStore = create<PlayerState>()((set) => ({
-  cover: "",
-  filePath: "",
-  title: "",
-  artist: "",
-  setCover: (cover: string) => set({ cover }),
-  setFilePath: (filePath: string) => set({ filePath }),
-  setTitle: (title: string) => set({ title }),
-  setArtist: (artist: string) => set({ artist }),
+  song: {
+    cover: "",
+    file: "",
+    title: "",
+    artist: "",
+  },
+  setSong: (song: Song) => set({ song }),
 
   isPlaying: false,
   isShuffled: false,

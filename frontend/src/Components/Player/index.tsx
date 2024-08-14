@@ -16,10 +16,7 @@ import styles from "./styles.module.css";
 
 const Player: React.FC = () => {
   const {
-    cover,
-    filePath,
-    title,
-    artist,
+    song: { title, artist, cover, file },
     isPlaying,
     setIsPlaying,
     isRepeating,
@@ -200,7 +197,7 @@ const Player: React.FC = () => {
         </div>
       </div>
 
-      <audio ref={audioRef} autoPlay src={filePath}></audio>
+      <audio ref={audioRef} autoPlay src={file} loop={isRepeating}></audio>
     </div>
   );
 };

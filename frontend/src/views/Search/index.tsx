@@ -4,6 +4,7 @@ import { usePlayerStore } from "../../stores/playerStore";
 import { useUrlStore } from "../../stores/urlStore";
 
 import styles from "./styles.module.css";
+import AnimatedText from "animated-text-letters";
 
 const Home = () => {
   const [songs, setSongs] = useState([]);
@@ -14,6 +15,8 @@ const Home = () => {
 
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+
+  const { setSong, setIsPlaying } = usePlayerStore();
 
   useEffect(() => {
     setLoading(true);
@@ -49,13 +52,13 @@ const Home = () => {
   }, [search]);
 
   function handleGetSong(song: any) {
-    usePlayerStore.setState({
-      filePath: `/getSong?file=${song}`,
+    setSong({
+      file: `/getSong?file=${song}`,
       title: song.split("/")[song.split("/").length - 1],
       artist: song.split("/")[song.split("/").length - 3],
       cover: `/getCover?file=${song}`,
-      isPlaying: true,
     });
+    setIsPlaying(true);
   }
 
   function handleOpenArtistProfile(artist: any) {
@@ -72,7 +75,16 @@ const Home = () => {
 
   return (
     <div className={styles.container}>
-      <h1 className={styles.title}>Search</h1>
+      <h1 className={styles.title}>
+        <AnimatedText
+          text="Search"
+          animation="fade-in"
+          delay={64}
+          easing="ease"
+          transitionOnlyDifferentLetters={true}
+          animationDuration={800}
+        />
+      </h1>
       <input
         type="text"
         value={search}
