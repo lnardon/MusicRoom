@@ -5,7 +5,7 @@ import { useUrlStore } from "../../stores/urlStore";
 import styles from "./styles.module.css";
 
 const Album: React.FC = () => {
-  const name = new URLSearchParams(window.location.search).get("album");
+  const name = new URLSearchParams(window.location.search).get("album") || "";
   const [artist, setArtist2] = useState(
     new URLSearchParams(window.location.search).get("artist")
   );
@@ -33,12 +33,12 @@ const Album: React.FC = () => {
 
   useEffect(() => {
     document.title = name || "Album";
-    fetch(`/getAlbum?album=${name}`)
+    fetch(`/getAlbum?album=${encodeURI(name)}`)
       .then((res) => res.json())
       .then((data) => {
-        setArtist2(data[0].artist);
+        setArtist2(data.artist);
         setCover2(`getCover?file=${name}`);
-        setTracks(data);
+        setTracks(data.songs);
       });
   }, [name, setArtist, setCover2, setTracks]);
 

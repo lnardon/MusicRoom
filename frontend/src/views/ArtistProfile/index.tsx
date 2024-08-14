@@ -8,7 +8,7 @@ const ArtistProfile: React.FC = () => {
   const setUrl = useUrlStore((state) => state.setUrl);
   const artist = new URLSearchParams(window.location.search).get("artist");
   const [info, setInfo] = useState({
-    artist: "",
+    name: "",
     albums: [],
     songs: [],
   });
@@ -29,7 +29,11 @@ const ArtistProfile: React.FC = () => {
     document.title = artist || "Artist Profile";
     fetch(`/getArtist?artist=${artist}`).then((res) => {
       res.json().then((data) => {
-        setInfo(data);
+        setInfo({
+          name: data.name,
+          albums: data.albums,
+          songs: data.songs,
+        });
       });
     });
   }, [artist]);
@@ -73,11 +77,11 @@ const ArtistProfile: React.FC = () => {
                 animationDelay: `${index * 0.08}s`,
               }}
               onClick={() => {
-                handleClick(album);
+                handleClick(album.title);
               }}
             >
               <img
-                src={`/getCover?file=${album}`}
+                src={`/getCover?file=${encodeURI(album.title)}`}
                 alt="cover image"
                 style={{
                   width: "100%",
@@ -85,7 +89,7 @@ const ArtistProfile: React.FC = () => {
                   marginBottom: "0.5rem",
                 }}
               />
-              <h4>{album}</h4>
+              <h4>{album.title}</h4>
             </div>
           ))}
         </div>

@@ -5,9 +5,18 @@ type FileList struct {
 }
 
 type ArtistInfo struct {
-    Artist string   `json:"artist"`
-    Albums []string `json:"albums"`
+    Name string   `json:"name"`
+    Albums []Album `json:"albums"`
     Songs  []Song   `json:"songs"`
+}
+
+type Album struct {
+    ID string `json:"id"`
+    Title string `json:"title"`
+    Cover string `json:"cover"`
+    ReleaseDate string `json:"release_date"`
+    Songs []Song `json:"songs"`
+    Artist string `json:"artist"`
 }
 
 type Song struct {
