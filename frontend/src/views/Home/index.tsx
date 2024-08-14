@@ -1,29 +1,24 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect } from "react";
 
-import { useUrlStore } from "../../stores/urlStore";
+import { usePlayerStore } from "../../stores/playerStore";
 
 const Home: React.FC = () => {
-  const [artists, setArtists] = useState([]);
-  const setUrl = useUrlStore((state) => state.setUrl);
+  const [recentlyPlayed, setRecentlyPlayed] = useState([]);
 
-  function handleClick(name: string) {
-    const searchParams = new URLSearchParams(window.location.search);
-    searchParams.set("artist", name);
-    searchParams.set("view", "artist_profile");
-    window.history.pushState(
-      {},
-      "",
-      `${window.location.pathname}?${searchParams.toString()}`
-    );
-    setUrl(window.location.search);
+  function handleClick(track: any) {
+    usePlayerStore.getState().setFilePath(`/getSong?file=${track.id}`);
+    usePlayerStore.getState().setTitle(track.title);
+    usePlayerStore.getState().setArtist(track.artist);
+    usePlayerStore.getState().setCover(`/getCover?file=${track.album}`);
+    usePlayerStore.getState().setIsPlaying(true);
   }
 
   useEffect(() => {
-    fetch("/getAllArtists")
+    fetch("/getHistory")
       .then((res) => res.json())
       .then((data) => {
-        setArtists(data);
+        setRecentlyPlayed(data);
       });
   }, []);
 
@@ -35,35 +30,49 @@ const Home: React.FC = () => {
         height: "calc(100vh - 6rem)",
       }}
     >
-      {/* <Album /> */}
       <div
         style={{
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
+          flexDirection: "column",
           padding: "20px",
           width: "100%",
-          flexWrap: "wrap",
         }}
       >
-        {artists?.map((artist: any) => (
+        {recentlyPlayed?.map((track: any) => (
           <div
-            key={artist}
+            key={track}
             style={{
               display: "flex",
               flexDirection: "row",
-              justifyContent: "center",
+              justifyContent: "flex-start",
               alignItems: "center",
-              height: "100px",
-              width: "200px",
-              border: "1px solid black",
-              marginBottom: "10px",
-              fontSize: "0.8rem",
+              width: "100%",
+              marginBottom: "1rem",
+              fontSize: "1rem",
               fontWeight: "400",
+              cursor: "pointer",
             }}
-            onClick={() => handleClick(artist)}
+            onClick={() => handleClick(track)}
           >
-            <h1>{artist}</h1>
+            <img
+              src={`/getCover?file=${track.album}`}
+              alt=""
+              style={{
+                width: "2rem",
+                height: "2rem",
+                borderRadius: "0.25rem",
+                marginRight: "1rem",
+              }}
+            />
+            <p
+              style={{
+                textAlign: "left",
+              }}
+            >
+              {track.title}
+            </p>
           </div>
         ))}
       </div>
