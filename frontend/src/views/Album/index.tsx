@@ -3,6 +3,7 @@ import { usePlayerStore } from "../../stores/playerStore";
 import { useUrlStore } from "../../stores/urlStore";
 import { Track } from "../../types";
 import styles from "./styles.module.css";
+import AnimatedText from "animated-text-letters";
 
 const Album: React.FC = () => {
   const name = new URLSearchParams(window.location.search).get("album") || "";
@@ -17,8 +18,8 @@ const Album: React.FC = () => {
   function handlePlay(track: Track) {
     setSong({
       title: track.title,
-      artist: track.artist,
-      cover: `/getCover?file=${track.album}`,
+      artist: artist || "",
+      cover: `/getCover?file=${name}`,
       file: `/getSong?file=${track.id}`,
     });
     setIsPlaying(true);
@@ -30,7 +31,7 @@ const Album: React.FC = () => {
       .then((res) => res.json())
       .then((data) => {
         setArtist(data.artist);
-        setCover(`getCover?file=${name}`);
+        setCover(`/getCover?file=${name}`);
         setTracks(data.songs);
       });
   }, [name, setCover, setTracks]);
@@ -40,7 +41,16 @@ const Album: React.FC = () => {
       <div className={styles.header}>
         <img className={styles.cover} src={cover} alt="cover image" />
         <div className={styles.headerText}>
-          <h1 className={styles.name}>{name}</h1>
+          <h1 className={styles.name}>
+            <AnimatedText
+              text={name}
+              easing="ease-in-out"
+              delay={28}
+              animationDuration={400}
+              animation="slide-up"
+              transitionOnlyDifferentLetters={true}
+            />
+          </h1>
           <h2 className={styles.artist}>
             <span className={styles.artistNameDetail}>by</span>
             <span

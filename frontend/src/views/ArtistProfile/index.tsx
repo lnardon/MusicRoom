@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useUrlStore } from "../../stores/urlStore";
 
 import styles from "./styles.module.css";
+import AnimatedText from "animated-text-letters";
 
 const ArtistProfile: React.FC = () => {
   const setUrl = useUrlStore((state) => state.setUrl);
@@ -37,7 +38,16 @@ const ArtistProfile: React.FC = () => {
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <h1 className={styles.name}>{artist}</h1>
+        <h1 className={styles.name}>
+          <AnimatedText
+            text={artist || ""}
+            easing="ease"
+            delay={16}
+            animationDuration={600}
+            animation="fade-in"
+            transitionOnlyDifferentLetters={true}
+          />
+        </h1>
       </div>
 
       <div className={styles.albums}>
