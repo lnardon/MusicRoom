@@ -20,3 +20,17 @@ body {
   align-items: center;
   width: 100vw;
 }
+
+*::-webkit-scrollbar {
+  width: 0.25rem;
+}
+*::-webkit-scrollbar-track {
+  background: #212121;
+}
+*::-webkit-scrollbar-thumb {
+  background-color: #f1f1f198;
+  border-radius: 1rem;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: #ffdc21;
+}
