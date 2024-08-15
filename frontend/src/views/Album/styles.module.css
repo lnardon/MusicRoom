@@ -10,7 +10,7 @@
 
 .header {
   width: 100%;
-  background-color: #42424242;
+  background-color: #060606;
   display: flex;
   justify-content: flex-start;
   align-items: center;
@@ -51,6 +51,22 @@
   font-size: 0.96rem;
 }
 
+.artistNameDetail {
+  font-size: 0.8rem;
+  margin-right: 0.5rem;
+  font-style: italic;
+}
+
+.artistName {
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-bottom: 1px solid transparent;
+}
+
+.artistName:hover {
+  border-bottom: 1px solid #aaaaaa;
+}
+
 .tracklist {
   width: 100%;
   display: flex;
@@ -58,12 +74,19 @@
   text-align: start;
 }
 
+.tracksContainer {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  justify-content: flex-start;
+}
+
 .track {
   width: 100%;
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  /* border: 1px solid #d4d4d421; */
   border-radius: 0.25rem;
   margin-bottom: 0.125rem;
   padding: 0.5rem;

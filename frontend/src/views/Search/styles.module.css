@@ -12,6 +12,8 @@
   font-size: 3rem;
   font-weight: 900;
   margin-bottom: 0.5rem;
+  display: flex;
+  align-items: flex-start;
 }
 
 .input {

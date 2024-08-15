@@ -29,51 +29,25 @@ const ArtistProfile: React.FC = () => {
     document.title = artist || "Artist Profile";
     fetch(`/getArtist?artist=${artist}`).then((res) => {
       res.json().then((data) => {
-        setInfo({
-          name: data.name,
-          albums: data.albums,
-          songs: data.songs,
-        });
+        setInfo(data);
       });
     });
   }, [artist]);
 
   return (
     <div className={styles.container}>
-      <div
-        className={styles.header}
-        style={{
-          backgroundColor: "rgba(0, 0, 0, 0.64)",
-        }}
-      >
+      <div className={styles.header}>
         <h1 className={styles.name}>{artist}</h1>
       </div>
 
       <div className={styles.albums}>
         <h3>Albums</h3>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "flex-start",
-            width: "100%",
-            flexWrap: "wrap",
-          }}
-        >
+        <div className={styles.albumsContainer}>
           {info.albums.map((album: any, index: any) => (
             <div
               className={styles.album}
               key={index}
               style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "flex-start",
-                justifyContent: "flex-start",
-                width: "12rem",
-                margin: "0.5rem",
-                backgroundColor: "rgba(0, 0, 0, 0.64)",
-                padding: "0.5rem",
-                borderRadius: "0.5rem",
-                cursor: "pointer",
                 animationDelay: `${index * 0.08}s`,
               }}
               onClick={() => {
@@ -83,11 +57,7 @@ const ArtistProfile: React.FC = () => {
               <img
                 src={`/getCover?file=${encodeURI(album.title)}`}
                 alt="cover image"
-                style={{
-                  width: "100%",
-                  borderRadius: "0.5rem",
-                  marginBottom: "0.5rem",
-                }}
+                className={styles.cover}
               />
               <h4>{album.title}</h4>
             </div>

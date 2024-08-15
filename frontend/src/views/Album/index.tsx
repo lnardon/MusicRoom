@@ -1,32 +1,24 @@
 import { useState, useEffect } from "react";
 import { usePlayerStore } from "../../stores/playerStore";
 import { useUrlStore } from "../../stores/urlStore";
-
+import { Track } from "../../types";
 import styles from "./styles.module.css";
 
 const Album: React.FC = () => {
   const name = new URLSearchParams(window.location.search).get("album") || "";
-  const [artist, setArtist2] = useState(
+  const [artist, setArtist] = useState(
     new URLSearchParams(window.location.search).get("artist")
   );
-  const [cover, setCover2] = useState("");
-  const [tracks, setTracks] = useState([
-    {
-      title: "State of the Art",
-      cover: "",
-      album: "Sleep Is the Cousin of Death",
-      duration: "2:45",
-    },
-  ]);
+  const [cover, setCover] = useState("");
+  const [tracks, setTracks] = useState<Track[]>([]);
   const { setSong, setIsPlaying } = usePlayerStore();
   const setUrl = useUrlStore((state) => state.setUrl);
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  function handlePlay(track: any) {
+  function handlePlay(track: Track) {
     setSong({
       title: track.title,
-      artist: artist || "",
-      cover: cover,
+      artist: track.artist,
+      cover: `/getCover?file=${track.album}`,
       file: `/getSong?file=${track.id}`,
     });
     setIsPlaying(true);
@@ -37,39 +29,22 @@ const Album: React.FC = () => {
     fetch(`/getAlbum?album=${encodeURI(name)}`)
       .then((res) => res.json())
       .then((data) => {
-        setArtist2(data.artist);
-        setCover2(`getCover?file=${name}`);
+        setArtist(data.artist);
+        setCover(`getCover?file=${name}`);
         setTracks(data.songs);
       });
-  }, [name, setCover2, setTracks]);
+  }, [name, setCover, setTracks]);
 
   return (
     <div className={styles.container}>
-      <div
-        className={styles.header}
-        style={{
-          backgroundColor: "rgba(0, 0, 0, 0.64)",
-        }}
-      >
+      <div className={styles.header}>
         <img className={styles.cover} src={cover} alt="cover image" />
         <div className={styles.headerText}>
           <h1 className={styles.name}>{name}</h1>
           <h2 className={styles.artist}>
+            <span className={styles.artistNameDetail}>by</span>
             <span
-              style={{
-                fontSize: "0.8rem",
-                fontStyle: "italic",
-                marginRight: "0.5rem",
-              }}
-            >
-              by
-            </span>
-            <span
-              style={{
-                cursor: "pointer",
-                color: "white",
-                textDecoration: "underline",
-              }}
+              className={styles.artistName}
               onClick={() => {
                 const searchParams = new URLSearchParams(
                   window.location.search
@@ -92,15 +67,7 @@ const Album: React.FC = () => {
 
       <div className={styles.tracklist}>
         <h3>Tracks</h3>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "flex-start",
-            width: "100%",
-            flexDirection: "column",
-            gap: "0.5rem",
-          }}
-        >
+        <div className={styles.tracksContainer}>
           {tracks.map((track, index) => (
             <div
               className={styles.track}
