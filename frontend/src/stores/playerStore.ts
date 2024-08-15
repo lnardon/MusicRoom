@@ -16,6 +16,9 @@ interface PlayerState {
   setIsPlaying: (isPlaying: boolean) => void;
   setIsShuffled: (isShuffled: boolean) => void;
   setIsRepeating: (isRepeating: boolean) => void;
+
+  queue: Song[];
+  setQueue: (queue: Song[]) => void;
 }
 
 export const usePlayerStore = create<PlayerState>()((set) => ({
@@ -33,4 +36,7 @@ export const usePlayerStore = create<PlayerState>()((set) => ({
   setIsPlaying: (isPlaying: boolean) => set({ isPlaying }),
   setIsShuffled: (isShuffled: boolean) => set({ isShuffled }),
   setIsRepeating: (isRepeating: boolean) => set({ isRepeating }),
+
+  queue: [],
+  setQueue: (queue: Song[]) => set({ queue }),
 }));
