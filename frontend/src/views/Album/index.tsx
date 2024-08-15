@@ -12,10 +12,32 @@ const Album: React.FC = () => {
   );
   const [cover, setCover] = useState("");
   const [tracks, setTracks] = useState<Track[]>([]);
-  const { setSong, setIsPlaying } = usePlayerStore();
+  const { setSong, setIsPlaying, setQueue, isShuffled, song } =
+    usePlayerStore();
   const setUrl = useUrlStore((state) => state.setUrl);
 
   function handlePlay(track: Track) {
+    const newQueue = isShuffled
+      ? [...tracks]
+          .sort(() => Math.random() - 0.5)
+          .map((t) => ({
+            title: t.title,
+            artist: artist || "",
+            cover: `/getCover?file=${name}`,
+            file: `/getSong?file=${t.id}`,
+          }))
+      : [...tracks]
+          .splice(
+            tracks.findIndex((t) => t.title === track.title) + 1,
+            tracks.length
+          )
+          .map((t) => ({
+            title: t.title,
+            artist: artist || "",
+            cover: `/getCover?file=${name}`,
+            file: `/getSong?file=${t.id}`,
+          }));
+    setQueue(newQueue);
     setSong({
       title: track.title,
       artist: artist || "",
@@ -83,6 +105,10 @@ const Album: React.FC = () => {
               className={styles.track}
               key={index}
               onClick={() => handlePlay(track)}
+              style={{
+                color: song.title === track.title ? "#ffd000" : "white",
+                fontWeight: song.title === track.title ? "bold" : "normal",
+              }}
             >
               <span
                 style={{

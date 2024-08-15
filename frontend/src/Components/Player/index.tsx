@@ -17,12 +17,15 @@ import styles from "./styles.module.css";
 const Player: React.FC = () => {
   const {
     song: { title, artist, cover, file },
+    setSong,
     isPlaying,
     setIsPlaying,
     isRepeating,
     isShuffled,
     setIsRepeating,
     setIsShuffled,
+    queue,
+    setQueue,
   } = usePlayerStore();
   const setUrl = useUrlStore((state) => state.setUrl);
 
@@ -54,6 +57,18 @@ const Player: React.FC = () => {
     const audioElem = audioRef.current;
     if (audioElem) {
       audioElem.addEventListener("timeupdate", handleTimeUpdate);
+      audioElem.addEventListener("ended", () => {
+        if (queue.length > 0) {
+          const nextSong = queue.shift();
+          setSong(nextSong!);
+          setQueue(queue);
+          audioElem.play();
+          setIsPlaying(true);
+          return;
+        }
+
+        setIsPlaying(false);
+      });
     }
 
     return () => {
@@ -61,14 +76,15 @@ const Player: React.FC = () => {
         audioElem.removeEventListener("timeupdate", handleTimeUpdate);
       }
     };
-  }, [audioRef]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [audioRef, queue]);
 
   const handleTimelineClick = (
     event: React.MouseEvent<HTMLDivElement>
   ): void => {
     const timeline = event.currentTarget;
-    const rect = timeline.getBoundingClientRect(); // Getting the bounds of the timeline
-    const offsetX = event.clientX - rect.left; // Correctly calculating the offset
+    const rect = timeline.getBoundingClientRect();
+    const offsetX = event.clientX - rect.left;
     const audio = audioRef.current;
     if (audio && timeline) {
       const newTime = (offsetX / rect.width) * audio.duration;
@@ -139,13 +155,28 @@ const Player: React.FC = () => {
             />
           </button>
           <button>
-            <SkipBack />
+            <SkipBack
+              onClick={() => {
+                if (audioRef.current) {
+                  audioRef.current.currentTime = 0;
+                }
+              }}
+            />
           </button>
           <button onClick={handlePlayPause}>
             {isPlaying ? <Pause size={28} /> : <Play size={28} />}
           </button>
           <button>
-            <SkipForward />
+            <SkipForward
+              onClick={() => {
+                if (queue.length > 0) {
+                  const nextSong = queue.shift();
+                  setSong(nextSong!);
+                  setQueue(queue);
+                  setIsPlaying(true);
+                }
+              }}
+            />
           </button>
           <button>
             <Dices
