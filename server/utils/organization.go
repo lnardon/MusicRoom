@@ -2,10 +2,14 @@ package utils
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
+	"os"
 	"strings"
+	"time"
 
 	"github.com/bogem/id3v2"
+	"github.com/faiface/beep/mp3"
 	"github.com/google/uuid"
 )
 
@@ -29,11 +33,28 @@ func PopulateDb(path string) {
 		}
 		defer tag.Close()
 
+		f, err := os.Open(file)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		defer f.Close()
+
+		streamer, format, err := mp3.Decode(f)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		defer streamer.Close()
+
+		fileDurationSeconds := streamer.Len() / format.SampleRate.N(time.Second)
+		formatedDuration := fmt.Sprintf("%02d:%02d", fileDurationSeconds/60, fileDurationSeconds%60)
+		
 		artistID, albumID := "", ""
 		artistName := strings.Split(tag.Artist(), "/")[0]
 		albumTitle := tag.Album()
 		songTitle := tag.Title()
-		duration := "3:30" // Fix this
+		duration := formatedDuration
 		releaseDate := tag.Year()
 
 		err = db.QueryRow("SELECT id FROM Artists WHERE name = ?", artistName).Scan(&artistID)
