@@ -6,10 +6,13 @@ import styles from "./styles.module.css";
 import AnimatedText from "animated-text-letters";
 
 const Album: React.FC = () => {
-  const name = new URLSearchParams(window.location.search).get("album") || "";
+  const albumId =
+    new URLSearchParams(window.location.search).get("album") || "";
   const [artist, setArtist] = useState(
     new URLSearchParams(window.location.search).get("artist")
   );
+  const artistId = new URLSearchParams(window.location.search).get("artist");
+  const [albumName, setAlbumName] = useState("");
   const [cover, setCover] = useState("");
   const [tracks, setTracks] = useState<Track[]>([]);
   const { setSong, setIsPlaying, setQueue, isShuffled, song } =
@@ -23,7 +26,7 @@ const Album: React.FC = () => {
           .map((t) => ({
             title: t.title,
             artist: artist || "",
-            cover: `/getCover?file=${name}`,
+            cover: `/getCover?file=${albumId}`,
             file: `/getSong?file=${t.id}`,
           }))
       : [...tracks]
@@ -34,29 +37,30 @@ const Album: React.FC = () => {
           .map((t) => ({
             title: t.title,
             artist: artist || "",
-            cover: `/getCover?file=${name}`,
+            cover: `/getCover?file=${albumId}`,
             file: `/getSong?file=${t.id}`,
           }));
     setQueue(newQueue);
     setSong({
       title: track.title,
       artist: artist || "",
-      cover: `/getCover?file=${name}`,
+      cover: `/getCover?file=${albumId}`,
       file: `/getSong?file=${track.id}`,
     });
     setIsPlaying(true);
   }
 
   useEffect(() => {
-    document.title = name || "Album";
-    fetch(`/getAlbum?album=${encodeURI(name)}`)
+    document.title = albumName || "Album";
+    fetch(`/getAlbum?album=${encodeURI(albumId)}`)
       .then((res) => res.json())
       .then((data) => {
         setArtist(data.artist);
-        setCover(`/getCover?file=${name}`);
+        setCover(`/getCover?file=${albumId}`);
         setTracks(data.songs);
+        setAlbumName(data.title);
       });
-  }, [name, setCover, setTracks]);
+  }, [albumId, setCover, setTracks]);
 
   return (
     <div className={styles.container}>
@@ -65,7 +69,7 @@ const Album: React.FC = () => {
         <div className={styles.headerText}>
           <h1 className={styles.name}>
             <AnimatedText
-              text={name}
+              text={albumName}
               easing="ease-in-out"
               delay={28}
               animationDuration={400}
@@ -81,7 +85,7 @@ const Album: React.FC = () => {
                 const searchParams = new URLSearchParams(
                   window.location.search
                 );
-                searchParams.set("artist", artist || "");
+                searchParams.set("artist", artistId || "");
                 searchParams.set("view", "artist_profile");
                 window.history.pushState(
                   {},

@@ -30,20 +30,20 @@ const ArtistProfile: React.FC = () => {
   }
 
   useEffect(() => {
-    document.title = artist || "Artist Profile";
+    document.title = info.name || "Artist Profile";
     fetch(`/getArtist?artist=${artist}`).then((res) => {
       res.json().then((data) => {
         setInfo(data);
       });
     });
-  }, [artist]);
+  }, [artist, info.name]);
 
   return (
     <div className={styles.container}>
       <div className={styles.header}>
         <h1 className={styles.name}>
           <AnimatedText
-            text={artist || ""}
+            text={info.name || ""}
             easing="ease"
             delay={16}
             animationDuration={600}
@@ -72,18 +72,38 @@ const ArtistProfile: React.FC = () => {
                 setSong({
                   title: song.title,
                   artist: artist || "",
-                  cover: `/getCover?file=${song.album}`,
+                  cover: `/getCover?file=${
+                    (
+                      info.albums.filter(
+                        (album: any) => album.title === song.album
+                      )[0] as { id: string }
+                    ).id
+                  }`,
                   file: `/getSong?file=${song.id}`,
                 });
                 setIsPlaying(true);
               }}
             >
-              <img
-                src={`/getCover?file=${encodeURI(song.album)}`}
-                alt="cover image"
-                className={styles.songCover}
-              />
-              <h4 className={styles.title}>{song.title}</h4>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                }}
+              >
+                <img
+                  src={`/getCover?file=${
+                    (
+                      info.albums.filter(
+                        (album: any) => album.title === song.album
+                      )[0] as { id: string }
+                    ).id
+                  }`}
+                  alt="cover image"
+                  className={styles.songCover}
+                />
+                <h4 className={styles.title}>{song.title}</h4>
+              </div>
+              <h4 className={styles.duration}>{song.duration}</h4>
             </div>
           ))
         }
@@ -100,11 +120,12 @@ const ArtistProfile: React.FC = () => {
                 animationDelay: `${index * 0.08}s`,
               }}
               onClick={() => {
-                handleClick(album.title);
+                console.log(album);
+                handleClick(album.id);
               }}
             >
               <img
-                src={`/getCover?file=${encodeURI(album.title)}`}
+                src={`/getCover?file=${encodeURI(album.id)}`}
                 alt="cover image"
                 className={styles.cover}
               />

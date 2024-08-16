@@ -45,7 +45,7 @@ const Home = () => {
 
     setFilteredArtists(
       artists.filter((artist: any) =>
-        artist.toLowerCase().includes(search.toLowerCase())
+        artist.name.toLowerCase().includes(search.toLowerCase())
       )
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -63,7 +63,7 @@ const Home = () => {
 
   function handleOpenArtistProfile(artist: any) {
     const searchParams = new URLSearchParams();
-    searchParams.set("artist", artist);
+    searchParams.set("artist", artist.id);
     searchParams.set("view", "artist_profile");
     window.history.pushState(
       {},
@@ -108,7 +108,7 @@ const Home = () => {
                   alt=""
                   className={styles.avatar}
                 />
-                <p>{artist}</p>
+                <p>{artist.name}</p>
               </div>
             ))}
           </div>

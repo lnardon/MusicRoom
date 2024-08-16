@@ -13,9 +13,15 @@ const Sidebar = ({
       <h1
         style={{
           marginBottom: "2rem",
+          lineHeight: "3rem",
+          fontWeight: "900",
+          fontSize: "2.5rem",
+          borderLeft: "4px solid #ffd000",
+          paddingLeft: "0.75rem",
+          borderRadius: "0.75rem 0rem",
         }}
       >
-        MusiCO
+        Music
       </h1>
       <div className={styles.button} onClick={() => setCurrentView("home")}>
         <Home size={22} color={currentView === "home" ? "#ffd000" : "white"} />

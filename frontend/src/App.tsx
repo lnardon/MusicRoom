@@ -8,6 +8,7 @@ import Search from "./views/Search";
 import Home from "./views/Home";
 import ArtistProfile from "./views/ArtistProfile";
 import Album from "./views/Album";
+import Stats from "./views/Stats";
 
 function App() {
   const url = useUrlStore((state) => state.url);
@@ -25,6 +26,8 @@ function App() {
         return <ArtistProfile />;
       case "album":
         return <Album />;
+      case "stats":
+        return <Stats />;
       default:
         return <Home />;
     }
@@ -44,7 +47,7 @@ function App() {
           height: "100vh",
         }}
       >
-        <Sidebar setCurrentView={setCurrentView} />
+        <Sidebar currentView={currentView} setCurrentView={setCurrentView} />
         {getView()}
       </div>
       <Player />

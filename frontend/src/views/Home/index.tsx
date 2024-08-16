@@ -77,7 +77,7 @@ const Home: React.FC = () => {
                 const searchParams = new URLSearchParams(
                   window.location.search
                 );
-                searchParams.set("album", album);
+                searchParams.set("album", album.id);
                 searchParams.set("view", "album");
                 window.history.pushState(
                   {},
@@ -88,7 +88,7 @@ const Home: React.FC = () => {
               }}
             >
               <img
-                src={`/getCover?file=${album}`}
+                src={`/getCover?file=${album.id}`}
                 alt=""
                 style={{
                   width: "100%",
@@ -102,7 +102,7 @@ const Home: React.FC = () => {
                   fontWeight: "600",
                 }}
               >
-                {album}
+                {album.title}
               </p>
             </div>
           ))}
