@@ -1,12 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
 import { useUrlStore } from "../../stores/urlStore";
+import { usePlayerStore } from "../../stores/playerStore";
 
 import styles from "./styles.module.css";
 import AnimatedText from "animated-text-letters";
 
 const ArtistProfile: React.FC = () => {
   const setUrl = useUrlStore((state) => state.setUrl);
+  const { setSong, setIsPlaying } = usePlayerStore();
+
   const artist = new URLSearchParams(window.location.search).get("artist");
   const [info, setInfo] = useState({
     name: "",
@@ -48,6 +51,42 @@ const ArtistProfile: React.FC = () => {
             transitionOnlyDifferentLetters={true}
           />
         </h1>
+      </div>
+
+      <div className={styles.songs}>
+        <h3>Tracks</h3>
+        {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          info.songs.map((song: any, index: any) => (
+            <div
+              className={styles.song}
+              key={index}
+              style={{
+                animationDelay: `${index * 0.08}s`,
+                background:
+                  index % 2 === 0
+                    ? "rgba(0, 0, 0, 0.32)"
+                    : "rgba(0, 0, 0, 0.08)",
+              }}
+              onClick={() => {
+                setSong({
+                  title: song.title,
+                  artist: artist || "",
+                  cover: `/getCover?file=${song.album}`,
+                  file: `/getSong?file=${song.id}`,
+                });
+                setIsPlaying(true);
+              }}
+            >
+              <img
+                src={`/getCover?file=${encodeURI(song.album)}`}
+                alt="cover image"
+                className={styles.songCover}
+              />
+              <h4 className={styles.title}>{song.title}</h4>
+            </div>
+          ))
+        }
       </div>
 
       <div className={styles.albums}>
