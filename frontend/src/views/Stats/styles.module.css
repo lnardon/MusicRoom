@@ -1,0 +1,85 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  height: calc(100vh - 6rem);
+  overflow-y: scroll;
+  padding: 2rem;
+}
+
+.title {
+  font-size: 3rem;
+  font-weight: 900;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: flex-start;
+}
+
+.statsContainer {
+  width: 100%;
+}
+
+.topStats {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.topStats > .stat {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  margin-bottom: 2rem;
+  padding: 1rem;
+}
+
+.stat > h2 {
+  font-size: 1.5rem;
+  font-weight: 900;
+  margin-bottom: 1rem;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  gap: 0.125rem;
+}
+
+.stat > div > div:nth-child(odd) {
+  background-color: #343434;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  opacity: 0;
+  animation: appear 0.2s ease forwards;
+}
+
+.stat > div > div:nth-child(even) {
+  background-color: #262626;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  opacity: 0;
+  animation: appear 0.16s ease forwards;
+}
+
+@keyframes appear {
+  from {
+    opacity: 0;
+    transform: translateX(-4%);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0%);
+  }
+}
