@@ -6,6 +6,7 @@ import (
 
 	AlbumModule "server/modules/album"
 	ArtistModule "server/modules/artist"
+	MetadataModule "server/modules/metadata"
 	SongModule "server/modules/song"
 	StatsModule "server/modules/stats"
 	Utils "server/utils"
@@ -29,6 +30,7 @@ func main(){
     http.HandleFunc("/getHistory", StatsModule.GetHistoryHandler)
     http.HandleFunc("/getStats", StatsModule.GetStatsHandler)
 
+    http.HandleFunc("/editMetadata", MetadataModule.UpdateFileMetadataHandler)
 
     PORT := ":7777"
     fmt.Printf("\nServer starting on port %s\n", PORT)
