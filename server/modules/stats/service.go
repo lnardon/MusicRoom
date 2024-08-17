@@ -3,6 +3,7 @@ package stats
 import (
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 
@@ -49,13 +50,40 @@ func GetStatsHandler(w http.ResponseWriter, r *http.Request) {
     songs := executeSongQuery(db)
     artists := executeArtistQuery(db)
     albums := executeAlbumQuery(db)
+    all_info := executeAllInfoQuery(db)
 
     w.Header().Set("Content-Type", "application/json")
     json.NewEncoder(w).Encode(map[string]interface{}{
         "songs":   songs,
         "artists": artists,
         "albums":  albums,
+        "all_info": all_info,
     })
+}
+
+func executeAllInfoQuery(db *sql.DB) string {
+    query := `
+        SELECT COUNT(DISTINCT s.id) as songs, COUNT(DISTINCT a.id) as albums, COUNT(DISTINCT art.id) as artists
+        FROM Songs s
+        JOIN Albums a ON s.album = a.id
+        JOIN Artists art ON a.artist = art.id
+    `
+    rows, err := db.Query(query)
+    if err != nil {
+        log.Printf("Database query error: %v", err)
+        return ""
+    }
+    defer rows.Close()
+
+    var songs, albums, artists int
+    for rows.Next() {
+        err := rows.Scan(&songs, &albums, &artists)
+        if err != nil {
+            log.Printf("Error scanning row: %v", err)
+            return ""
+        }
+    }
+    return fmt.Sprintf("%d songs, %d albums, %d artists", songs, albums, artists)
 }
 
 func executeSongQuery(db *sql.DB) []Song {
@@ -232,6 +260,7 @@ func GetHistoryHandler(w http.ResponseWriter, r *http.Request) {
     response := struct {
         Songs  []Types.Song `json:"songs"`
         Albums []Types.Album `json:"albums"`
+        AllInfo string `json:"all_info"`
     }{
         Songs:  history,
         Albums: albums,
