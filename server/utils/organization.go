@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"net/http"
 	"os"
 	"strings"
 	"time"
@@ -13,14 +14,14 @@ import (
 	"github.com/google/uuid"
 )
 
-func PopulateDb(path string) {
+func ScanHandler(w http.ResponseWriter, r *http.Request) {
 	db, err := sql.Open("sqlite3", "./db/database.db")
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer db.Close()
 
-	files, err := GetAllFilesInPath(path)
+	files, err := GetAllFilesInPath("/media/lucas/HDD1/Music/")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -102,6 +103,8 @@ func PopulateDb(path string) {
 			continue
 		}
 	}
+
+	w.Write([]byte("Done"))
 }
 
 
