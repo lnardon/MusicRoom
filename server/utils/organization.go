@@ -25,7 +25,8 @@ func PopulateDb(path string) {
 		log.Fatal(err)
 	}
 
-	for _, file := range files {
+	for idx, file := range files {
+		fmt.Println("Processing file:", idx, "of", len(files))
 		tag, err := id3v2.Open(file, id3v2.Options{Parse: true})
 		if err != nil {
 			log.Println("Error opening MP3 file:", err)
@@ -35,15 +36,20 @@ func PopulateDb(path string) {
 
 		f, err := os.Open(file)
 		if err != nil {
-			fmt.Println(err)
+			fmt.Println(err, "Error opening file:", file)
 			return
 		}
 		defer f.Close()
 
 		streamer, format, err := mp3.Decode(f)
 		if err != nil {
+			fmt.Println("@#@#@#@#@#@#@#@#@#@#@#@#@#@#")
+			fmt.Println("@#@#@#@#@#@#@#@#@#@#@#@#@#@#")
+			fmt.Println(err, "Error decoding file: =====> ", file)
 			fmt.Println(err)
-			return
+			fmt.Println("@#@#@#@#@#@#@#@#@#@#@#@#@#@#")
+			fmt.Println("@#@#@#@#@#@#@#@#@#@#@#@#@#@#")
+			continue
 		}
 		defer streamer.Close()
 
@@ -56,6 +62,10 @@ func PopulateDb(path string) {
 		songTitle := tag.Title()
 		duration := formatedDuration
 		releaseDate := tag.Year()
+
+		if songTitle == "" {
+			songTitle = strings.TrimSuffix(strings.Split(file, "/")[len(strings.Split(file, "/"))-1], ".mp3")
+		}
 
 		err = db.QueryRow("SELECT id FROM Artists WHERE name = ?", artistName).Scan(&artistID)
 		if err == sql.ErrNoRows {
@@ -77,10 +87,18 @@ func PopulateDb(path string) {
 			}
 		}
 
-		songID := uuid.New().String()
-		_, err = db.Exec("INSERT INTO Songs (id, title, duration, track_number, release_date, path, album, lyrics) VALUES (?, ?, ?, '0', ?, ?, ?, 'N/A')", songID, songTitle, duration, releaseDate, file, albumID)
-		if err != nil {
-			log.Println("Error inserting song:", err)
+		var existingSongID string
+		err = db.QueryRow("SELECT id FROM Songs WHERE title = ? AND album = ?", songTitle, albumID).Scan(&existingSongID)
+		if err == sql.ErrNoRows {
+			songID := uuid.New().String()
+			_, err = db.Exec("INSERT INTO Songs (id, title, duration, track_number, release_date, path, album, lyrics) VALUES (?, ?, ?, '0', ?, ?, ?, 'N/A')", songID, songTitle, duration, releaseDate, file, albumID)
+			if err != nil {
+				log.Println("Error inserting song:", err)
+				continue
+			}
+			log.Println("Inserted song with ID:", songID,"Title:", songTitle)
+		} else {
+			log.Println("Song already exists with ID:", existingSongID)
 			continue
 		}
 	}
