@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 
@@ -56,10 +57,14 @@ func GetAlbumHandler(w http.ResponseWriter, r *http.Request){
         return
     }
 
-    var albumArtist string
-    err = db.QueryRow("SELECT name FROM Artists WHERE id = (SELECT artist FROM Albums WHERE id = ?)", album).Scan(&albumArtist)
+    var albumArtist struct {
+        ID   string `json:"id"`
+        Name string `json:"name"`
+    }
+    err = db.QueryRow("SELECT id, name FROM Artists WHERE id = (SELECT artist FROM Albums WHERE id = ?)", album).Scan(&albumArtist.ID, &albumArtist.Name)
     if err != nil {
         http.Error(w, "Failed to query artist", http.StatusInternalServerError)
+        log.Printf("Failed to query artist: %v", err)
         return
     }
 
@@ -77,11 +82,20 @@ func GetAlbumHandler(w http.ResponseWriter, r *http.Request){
     }
     defer songsRows.Close()
 
-    var albumInfo Types.Album
+    var albumInfo struct {
+        ID     string `json:"id"`
+        Title  string `json:"title"`
+        Cover  string `json:"cover"`
+        Artist struct {
+            ID   string `json:"id"`
+            Name string `json:"name"`
+        } `json:"artist"`
+        Songs []Types.Song `json:"songs"`
+    }
     albumInfo.Title = albumTitle
     albumInfo.ID = album
     albumInfo.Cover = "/album_covers/cover_" + album + ".jpg"
-    albumInfo.Artist = albumArtist
+    albumInfo.Artist = albumArtist 
     
     for songsRows.Next() {
         var song Types.Song

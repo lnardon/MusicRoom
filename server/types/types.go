@@ -5,6 +5,7 @@ type FileList struct {
 }
 
 type ArtistInfo struct {
+    ID     string `json:"id"`
     Name string   `json:"name"`
     Albums []Album `json:"albums"`
     Songs  []Song   `json:"songs"`
