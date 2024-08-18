@@ -5,6 +5,7 @@ import { usePlayerStore } from "../../stores/playerStore";
 
 import styles from "./styles.module.css";
 import AnimatedText from "animated-text-letters";
+import { PlayIcon } from "lucide-react";
 
 const Stats: React.FC = () => {
   const setUrl = useUrlStore((state) => state.setUrl);
@@ -31,6 +32,15 @@ const Stats: React.FC = () => {
           animationDuration={600}
         />
       </h1>
+      <p
+        style={{
+          marginBottom: "2rem",
+          fontSize: "1rem",
+          fontWeight: 300,
+        }}
+      >
+        {stats.all_info}
+      </p>
       <div className={styles.statsContainer}>
         <div className={styles.topStats}>
           <div className={styles.stat}>
@@ -117,7 +127,7 @@ const Stats: React.FC = () => {
                       }}
                       key={index}
                     >
-                      {index + 1}. {album.title}
+                      {album.title}
                     </p>
                   </div>
                 ))}
@@ -174,7 +184,24 @@ const Stats: React.FC = () => {
                       {song.title}
                     </p>
                   </div>
-                  <p>{song.plays} plays</p>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "flex-end",
+                      fontSize: "0.9rem",
+                      fontWeight: 400,
+                    }}
+                  >
+                    <PlayIcon
+                      size={12}
+                      style={{
+                        marginRight: "0.5rem",
+                        color: "rgba(255, 255, 255, 0.8)",
+                      }}
+                    />
+                    <p>{song.plays}</p>
+                  </div>
                 </div>
               ))}
           </div>

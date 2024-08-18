@@ -1,10 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
+import AnimatedText from "animated-text-letters";
 import { useUrlStore } from "../../stores/urlStore";
 import { usePlayerStore } from "../../stores/playerStore";
-
 import styles from "./styles.module.css";
-import AnimatedText from "animated-text-letters";
 
 const ArtistProfile: React.FC = () => {
   const setUrl = useUrlStore((state) => state.setUrl);
@@ -55,58 +54,56 @@ const ArtistProfile: React.FC = () => {
 
       <div className={styles.songs}>
         <h3>Tracks</h3>
-        {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          info.songs.map((song: any, index: any) => (
+        {info.songs.map((song: any, index: any) => (
+          <div
+            className={styles.song}
+            key={index}
+            style={{
+              animationDelay: `${index * 0.08}s`,
+              background:
+                index % 2 === 0 ? "rgba(0, 0, 0, 0.32)" : "rgba(0, 0, 0, 0.08)",
+            }}
+            onClick={() => {
+              setSong({
+                title: song.title,
+                artist: {
+                  id: artist || "",
+                  name: info.name,
+                },
+                cover: `/getCover?file=${
+                  (
+                    info.albums.filter(
+                      (album: any) => album.title === song.album
+                    )[0] as { id: string }
+                  ).id
+                }`,
+                file: `/getSong?file=${song.id}`,
+              });
+              setIsPlaying(true);
+            }}
+          >
             <div
-              className={styles.song}
-              key={index}
               style={{
-                animationDelay: `${index * 0.08}s`,
-                background:
-                  index % 2 === 0
-                    ? "rgba(0, 0, 0, 0.32)"
-                    : "rgba(0, 0, 0, 0.08)",
-              }}
-              onClick={() => {
-                setSong({
-                  title: song.title,
-                  artist: artist || "",
-                  cover: `/getCover?file=${
-                    (
-                      info.albums.filter(
-                        (album: any) => album.title === song.album
-                      )[0] as { id: string }
-                    ).id
-                  }`,
-                  file: `/getSong?file=${song.id}`,
-                });
-                setIsPlaying(true);
+                display: "flex",
+                justifyContent: "space-between",
               }}
             >
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                }}
-              >
-                <img
-                  src={`/getCover?file=${
-                    (
-                      info.albums.filter(
-                        (album: any) => album.title === song.album
-                      )[0] as { id: string }
-                    ).id
-                  }`}
-                  alt="cover image"
-                  className={styles.songCover}
-                />
-                <h4 className={styles.title}>{song.title}</h4>
-              </div>
-              <h4 className={styles.duration}>{song.duration}</h4>
+              <img
+                src={`/getCover?file=${
+                  (
+                    info.albums.filter(
+                      (album: any) => album.title === song.album
+                    )[0] as { id: string }
+                  ).id
+                }`}
+                alt="cover image"
+                className={styles.songCover}
+              />
+              <h4 className={styles.title}>{song.title}</h4>
             </div>
-          ))
-        }
+            <h4 className={styles.duration}>{song.duration}</h4>
+          </div>
+        ))}
       </div>
 
       <div className={styles.albums}>
@@ -120,7 +117,6 @@ const ArtistProfile: React.FC = () => {
                 animationDelay: `${index * 0.08}s`,
               }}
               onClick={() => {
-                console.log(album);
                 handleClick(album.id);
               }}
             >
