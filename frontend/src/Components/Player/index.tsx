@@ -241,6 +241,21 @@ const Player: React.FC = () => {
       </div>
 
       <div className={styles.volume}>
+        <button
+          onClick={() => {
+            const searchParams = new URLSearchParams(window.location.search);
+            searchParams.set("view", "lyrics");
+            window.history.pushState(
+              {},
+              "",
+              `${window.location.pathname}?${searchParams.toString()}`
+            );
+            setUrl(window.location.search);
+          }}
+        >
+          View Lyrics
+        </button>
+
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 24 24"

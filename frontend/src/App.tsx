@@ -9,6 +9,7 @@ import Home from "./views/Home";
 import ArtistProfile from "./views/ArtistProfile";
 import Album from "./views/Album";
 import Stats from "./views/Stats";
+import Lyrics from "./views/Lyrics";
 
 function App() {
   const url = useUrlStore((state) => state.url);
@@ -28,6 +29,8 @@ function App() {
         return <Album />;
       case "stats":
         return <Stats />;
+      case "lyrics":
+        return <Lyrics />;
       default:
         return <Home />;
     }
