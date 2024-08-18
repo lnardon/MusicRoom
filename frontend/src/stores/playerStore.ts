@@ -4,7 +4,10 @@ interface Song {
   cover: string;
   file: string;
   title: string;
-  artist: string;
+  artist: {
+    id: string;
+    name: string;
+  };
 }
 interface PlayerState {
   song: Song;
@@ -19,6 +22,14 @@ interface PlayerState {
 
   queue: Song[];
   setQueue: (queue: Song[]) => void;
+
+  audioRef: HTMLAudioElement | null;
+  setAudioRef: (audioRef: HTMLAudioElement) => void;
+
+  freq1: number;
+  freq2: number;
+  setFreq1: (freq1: number) => void;
+  setFreq2: (freq2: number) => void;
 }
 
 export const usePlayerStore = create<PlayerState>()((set) => ({
@@ -26,7 +37,10 @@ export const usePlayerStore = create<PlayerState>()((set) => ({
     cover: "",
     file: "",
     title: "",
-    artist: "",
+    artist: {
+      id: "",
+      name: "",
+    },
   },
   setSong: (song: Song) => set({ song }),
 
@@ -39,4 +53,13 @@ export const usePlayerStore = create<PlayerState>()((set) => ({
 
   queue: [],
   setQueue: (queue: Song[]) => set({ queue }),
+
+  audioRef: null,
+  setAudioRef: (audioRef: HTMLAudioElement) => set({ audioRef }),
+
+  freq1: 0,
+  freq2: 0,
+
+  setFreq1: (freq1: number) => set({ freq1 }),
+  setFreq2: (freq2: number) => set({ freq2 }),
 }));

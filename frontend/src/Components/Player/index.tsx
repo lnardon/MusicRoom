@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import { usePlayerStore } from "../../stores/playerStore";
 import { useUrlStore } from "../../stores/urlStore";
-
+import { useAudioAnalyser } from "./analyser";
 import "animated-text-letters/index.css";
 import styles from "./styles.module.css";
 
@@ -26,11 +26,14 @@ const Player: React.FC = () => {
     setIsShuffled,
     queue,
     setQueue,
+    setAudioRef,
+    setFreq1,
+    setFreq2,
   } = usePlayerStore();
   const setUrl = useUrlStore((state) => state.setUrl);
-
-  const [progress, setProgress] = useState<number>(0);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const analyser = useAudioAnalyser(audioRef, isPlaying);
+  const [progress, setProgress] = useState<number>(0);
 
   const handlePlayPause = (): void => {
     const audio = audioRef.current;
@@ -70,6 +73,12 @@ const Player: React.FC = () => {
         setIsPlaying(false);
       });
     }
+
+    if (audioElem) setAudioRef(audioElem);
+
+    setInterval(() => {
+      analyser.startAnalyser(setFreq1, setFreq2);
+    }, 50);
 
     return () => {
       if (audioElem) {
@@ -132,9 +141,12 @@ const Player: React.FC = () => {
               animationDuration={800}
             />
           </span>
-          <span className={styles.artist} onClick={() => handleClick(artist)}>
+          <span
+            className={styles.artist}
+            onClick={() => handleClick(artist.id)}
+          >
             <AnimatedText
-              text={artist}
+              text={artist.name}
               animation="slide-up"
               delay={26}
               easing="ease"
@@ -226,6 +238,31 @@ const Player: React.FC = () => {
             </div>
           </div>
         </div>
+      </div>
+
+      <div className={styles.volume}>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="rgba(255, 255, 255, 0.8)"
+          width="24px"
+          height="24px"
+        >
+          <path d="M7 9v6h4l5 5V4l-5 5H7z" />
+        </svg>
+        <input
+          type="range"
+          min="0"
+          max="1"
+          step="0.05"
+          defaultValue="1"
+          onChange={(event) => {
+            const audio = audioRef.current;
+            if (audio) {
+              audio.volume = parseFloat(event.target.value);
+            }
+          }}
+        />
       </div>
 
       <audio ref={audioRef} autoPlay src={file} loop={isRepeating}></audio>

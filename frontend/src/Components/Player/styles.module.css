@@ -116,6 +116,23 @@ audio {
   cursor: pointer;
 }
 
+.volume {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  position: absolute;
+  right: 1rem;
+}
+
+.volume > input {
+  width: 8em;
+  height: 0.5rem;
+  border-radius: 0.25rem;
+  outline: none;
+  cursor: pointer;
+}
+
 @keyframes appear {
   from {
     opacity: 0;
