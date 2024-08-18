@@ -151,7 +151,7 @@ const Stats: React.FC = () => {
                   onClick={() => {
                     setSong({
                       title: song.title,
-                      artist: song.album.artist.name || "",
+                      artist: song.artist,
                       cover: `/getCover?file=${song.album.id}`,
                       file: `/getSong?file=${song.id}`,
                     });

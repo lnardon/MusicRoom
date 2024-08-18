@@ -1,14 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
-import { usePlayerStore } from "../../stores/playerStore";
 import { useUrlStore } from "../../stores/urlStore";
 
 import styles from "./styles.module.css";
 import AnimatedText from "animated-text-letters";
 
 const Home = () => {
-  const [songs, setSongs] = useState([]);
-  const [filteredSongs, setFilteredSongs] = useState([]);
+  // const [songs, setSongs] = useState([]);
+  // const [filteredSongs, setFilteredSongs] = useState([]);
 
   const [artists, setArtists] = useState([]);
   const [filteredArtists, setFilteredArtists] = useState([]);
@@ -16,17 +15,17 @@ const Home = () => {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
 
-  const { setSong, setIsPlaying } = usePlayerStore();
+  // const { setSong, setIsPlaying } = usePlayerStore();
 
   useEffect(() => {
     setLoading(true);
-    fetch("/getAllFiles")
-      .then((res) => res.json())
-      .then((data) => {
-        setSongs(data.files);
-        setFilteredSongs(data.files);
-        setLoading(false);
-      });
+    // fetch("/getAllFiles")
+    //   .then((res) => res.json())
+    //   .then(() => {
+    //     // setSongs(data.files);
+    //     // setFilteredSongs(data.files);
+    //     setLoading(false);
+    //   });
 
     fetch("/getAllArtists")
       .then((res) => res.json())
@@ -34,14 +33,15 @@ const Home = () => {
         setArtists(data);
         setFilteredArtists(data);
       });
+    setLoading(false);
   }, []);
 
   useEffect(() => {
-    setFilteredSongs(
-      songs.filter((song: any) =>
-        song.toLowerCase().includes(search.toLowerCase())
-      )
-    );
+    // setFilteredSongs(
+    //   songs.filter((song: any) =>
+    //     song.toLowerCase().includes(search.toLowerCase())
+    //   )
+    // );
 
     setFilteredArtists(
       artists.filter((artist: any) =>
@@ -51,15 +51,15 @@ const Home = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search]);
 
-  function handleGetSong(song: any) {
-    setSong({
-      file: `/getSong?file=${song}`,
-      title: song.split("/")[song.split("/").length - 1],
-      artist: song.split("/")[song.split("/").length - 3],
-      cover: `/getCover?file=${song}`,
-    });
-    setIsPlaying(true);
-  }
+  // function handleGetSong(song: any) {
+  //   setSong({
+  //     file: `/getSong?file=${song}`,
+  //     title: song.split("/")[song.split("/").length - 1],
+  //     artist: song.split("/")[song.split("/").length - 3],
+  //     cover: `/getCover?file=${song}`,
+  //   });
+  //   setIsPlaying(true);
+  // }
 
   function handleOpenArtistProfile(artist: any) {
     const searchParams = new URLSearchParams();
@@ -112,7 +112,8 @@ const Home = () => {
               </div>
             ))}
           </div>
-          <ul
+
+          {/* <ul
             style={{
               width: "100%",
             }}
@@ -132,7 +133,7 @@ const Home = () => {
                 <div>{"|-------- " + song.split("/").slice(7, 8)}</div>
               </div>
             ))}
-          </ul>
+          </ul> */}
         </>
       )}
     </div>
