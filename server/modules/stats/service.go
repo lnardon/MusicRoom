@@ -21,6 +21,7 @@ type Song struct {
     Lyrics      string `json:"lyrics"`
     Plays       int    `json:"plays"`
     Album       Album  `json:"album"`
+    Artist      Artist `json:"artist"`
 }
 
 type Artist struct {
@@ -124,6 +125,7 @@ func executeSongQuery(db *sql.DB) []Song {
         }
         album.Artist = artist
         song.Album = album
+        song.Artist = artist
         songs = append(songs, song)
     }
     return songs
