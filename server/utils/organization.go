@@ -89,7 +89,8 @@ func ScanHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		var existingSongID string
-		err = db.QueryRow("SELECT id FROM Songs WHERE title = ? AND album = ?", songTitle, albumID).Scan(&existingSongID)
+		var path string
+		err = db.QueryRow("SELECT id, path FROM Songs WHERE title = ? AND album = ?", songTitle, albumID).Scan(&existingSongID, &path)
 		if err == sql.ErrNoRows {
 			songID := uuid.New().String()
 			_, err = db.Exec("INSERT INTO Songs (id, title, duration, track_number, release_date, path, album, lyrics) VALUES (?, ?, ?, '0', ?, ?, ?, 'N/A')", songID, songTitle, duration, releaseDate, file, albumID)
@@ -99,8 +100,16 @@ func ScanHandler(w http.ResponseWriter, r *http.Request) {
 			}
 			log.Println("Inserted song with ID:", songID,"Title:", songTitle)
 		} else {
-			log.Println("Song already exists with ID:", existingSongID)
-			continue
+			if path != file {
+				log.Println("Song path has changed, updating path...")
+				_, err = db.Exec("UPDATE Songs SET path = ? WHERE id = ?", file, existingSongID)
+				if err != nil {
+					log.Println("Error updating song path:", err)
+					continue
+				}
+			} else {
+				log.Println("Song already exists, skipping...")
+			}
 		}
 	}
 
