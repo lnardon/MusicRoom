@@ -7,13 +7,14 @@ import {
   Dices,
   SkipForward,
   SkipBack,
+  MicVocal,
 } from "lucide-react";
 import { usePlayerStore } from "../../stores/playerStore";
 import { useUrlStore } from "../../stores/urlStore";
 import { useAudioAnalyser } from "./analyser";
 import "animated-text-letters/index.css";
 import styles from "./styles.module.css";
-import { HandleFallbackImage } from "../../utils/helpers";
+import { HandleFallbackImage, urlHistoryHandler } from "../../utils/helpers";
 
 const Player: React.FC = () => {
   const {
@@ -240,20 +241,33 @@ const Player: React.FC = () => {
       </div>
 
       <div className={styles.volume}>
-        <button
+        <MicVocal
+          size={20}
+          strokeWidth={2}
+          style={{
+            cursor: "pointer",
+          }}
+          color={
+            window.location.search.includes("view=lyrics")
+              ? "#ffd000"
+              : "rgba(255, 255, 255, 0.8)"
+          }
           onClick={() => {
             const searchParams = new URLSearchParams(window.location.search);
-            searchParams.set("view", "lyrics");
-            window.history.pushState(
-              {},
-              "",
-              `${window.location.pathname}?${searchParams.toString()}`
-            );
-            setUrl(window.location.search);
+            if (searchParams.get("view") === "lyrics") {
+              searchParams.delete("view");
+              window.history.pushState(
+                {},
+                "",
+                `${window.location.pathname}?${searchParams.toString()}`
+              );
+              setUrl(window.location.search);
+              return;
+            }
+
+            urlHistoryHandler("view", "lyrics", setUrl);
           }}
-        >
-          View Lyrics
-        </button>
+        />
 
         <svg
           xmlns="http://www.w3.org/2000/svg"

@@ -138,6 +138,10 @@ const Album: React.FC = () => {
               style={{
                 color: song.title === track.title ? "#ffd000" : "white",
                 fontWeight: song.title === track.title ? "bold" : "normal",
+                borderLeft:
+                  song.title === track.title
+                    ? "0.25rem solid #ffd000"
+                    : "0.25rem solid transparent",
                 background:
                   index % 2 === 0
                     ? "rgba(0, 0, 0, 0.32)"
