@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import AnimatedText from "animated-text-letters";
 import { useUrlStore } from "../../stores/urlStore";
 import { usePlayerStore } from "../../stores/playerStore";
+import { HandleFallbackImage } from "../../utils/helpers";
 import styles from "./styles.module.css";
 
 const ArtistProfile: React.FC = () => {
@@ -88,17 +89,16 @@ const ArtistProfile: React.FC = () => {
                 justifyContent: "space-between",
               }}
             >
-              <img
-                src={`/getCover?file=${
+              {HandleFallbackImage(
+                `/getCover?file=${
                   (
                     info.albums.filter(
                       (album: any) => album.title === song.album
                     )[0] as { id: string }
                   ).id
-                }`}
-                alt="cover image"
-                className={styles.songCover}
-              />
+                }`,
+                styles.songCover
+              )}
               <h4 className={styles.title}>{song.title}</h4>
             </div>
             <h4 className={styles.duration}>{song.duration}</h4>
@@ -120,11 +120,10 @@ const ArtistProfile: React.FC = () => {
                 handleClick(album.id);
               }}
             >
-              <img
-                src={`/getCover?file=${encodeURI(album.id)}`}
-                alt="cover image"
-                className={styles.cover}
-              />
+              {HandleFallbackImage(
+                `/getCover?file=${encodeURI(album.id)}`,
+                styles.cover
+              )}
               <h4>{album.title}</h4>
             </div>
           ))}

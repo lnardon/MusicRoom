@@ -6,6 +6,7 @@ import { useUrlStore } from "../../stores/urlStore";
 
 import styles from "./styles.module.css";
 import AnimatedText from "animated-text-letters";
+import { HandleFallbackImage } from "../../utils/helpers";
 
 const Home: React.FC = () => {
   const [recentlyPlayed, setRecentlyPlayed] = useState([]);
@@ -87,15 +88,13 @@ const Home: React.FC = () => {
                 useUrlStore.getState().setUrl(window.location.search);
               }}
             >
-              <img
-                src={`/getCover?file=${album.id}`}
-                alt=""
-                style={{
-                  width: "100%",
-                  borderRadius: "0.5rem",
-                  marginBottom: "0.5rem",
-                }}
-              />
+              {HandleFallbackImage(`/getCover?file=${album.id}`, "", null, {
+                width: "100%",
+                maxWidth: "12rem",
+                height: "11rem",
+                borderRadius: "0.5rem",
+                marginBottom: "0.5rem",
+              })}
               <p
                 style={{
                   textAlign: "left",
@@ -133,6 +132,7 @@ const Home: React.FC = () => {
           <div
             key={track}
             style={{
+              animationDelay: `${index * 0.08}s`,
               backgroundColor:
                 index % 2 === 0
                   ? "rgba(23, 23, 23, 1)"
@@ -141,16 +141,12 @@ const Home: React.FC = () => {
             className={styles.track}
             onClick={() => handleClick(track)}
           >
-            <img
-              src={`/getCover?file=${track.album}`}
-              alt=""
-              style={{
-                width: "2rem",
-                height: "2rem",
-                borderRadius: "0.25rem",
-                marginRight: "1rem",
-              }}
-            />
+            {HandleFallbackImage(`/getCover?file=${track.album}`, "", null, {
+              width: "2rem",
+              height: "2rem",
+              borderRadius: "0.25rem",
+              marginRight: "1rem",
+            })}
             <p
               style={{
                 textAlign: "left",

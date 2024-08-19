@@ -6,6 +6,7 @@ import { usePlayerStore } from "../../stores/playerStore";
 import styles from "./styles.module.css";
 import AnimatedText from "animated-text-letters";
 import { PlayIcon } from "lucide-react";
+import { HandleFallbackImage } from "../../utils/helpers";
 
 const Stats: React.FC = () => {
   const setUrl = useUrlStore((state) => state.setUrl);
@@ -111,16 +112,17 @@ const Stats: React.FC = () => {
                       setUrl(window.location.search);
                     }}
                   >
-                    <img
-                      src={`/getCover?file=${album.id}`}
-                      alt={album.title}
-                      style={{
+                    {HandleFallbackImage(
+                      `/getCover?file=${album.id}`,
+                      styles.albumCover,
+                      null,
+                      {
                         width: "1.25rem",
                         height: "1.25rem",
                         borderRadius: "0.25rem",
                         marginRight: "0.5rem",
-                      }}
-                    />
+                      }
+                    )}
                     <p
                       style={{
                         textAlign: "left",
@@ -165,16 +167,17 @@ const Stats: React.FC = () => {
                       justifyContent: "flex-start",
                     }}
                   >
-                    <img
-                      src={`/getCover?file=${song.album.id}`}
-                      alt={song.album.title}
-                      style={{
+                    {HandleFallbackImage(
+                      `/getCover?file=${song.album.id}`,
+                      styles.songCover,
+                      null,
+                      {
                         width: "1.25rem",
                         height: "1.25rem",
                         borderRadius: "0.25rem",
                         marginRight: "0.5rem",
-                      }}
-                    />
+                      }
+                    )}
                     <p
                       style={{
                         textAlign: "left",

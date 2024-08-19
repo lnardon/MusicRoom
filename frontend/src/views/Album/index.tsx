@@ -5,6 +5,7 @@ import { useUrlStore } from "../../stores/urlStore";
 import { Track } from "../../types";
 import styles from "./styles.module.css";
 import AnimatedText from "animated-text-letters";
+import { HandleFallbackImage } from "../../utils/helpers";
 
 const Album: React.FC = () => {
   const albumId =
@@ -77,27 +78,21 @@ const Album: React.FC = () => {
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <img
-          ref={coverRef}
-          style={{
-            filter: `grayscale(${
-              lerp(0, 1, Math.sin(freq2 / 255) * 2.25) * 16
-            }%)`,
-            boxShadow: `0 0 ${lerp(0, 1, Math.sin(freq2 / 255)) * 2.25}rem ${
-              Math.sin(freq2 / 255) * 0.75
-            }rem rgba(222, 222, 222, ${
-              lerp(0, 1, Math.sin(freq2 / 255)) * 0.32
-            })`,
-            border: `${
-              cubicEase(lerp(0, 1, Math.sin(freq2 / 255))) * 0.2
-            }rem solid rgba(255, 255, 255, ${
-              lerp(0, 1, Math.sin(freq1 / 255)) * 1
-            })`,
-          }}
-          className={styles.cover}
-          src={cover}
-          alt="cover image"
-        />
+        {HandleFallbackImage(cover, styles.cover, coverRef, {
+          filter: `grayscale(${
+            lerp(0, 1, Math.sin(freq2 / 255) * 2.25) * 16
+          }%)`,
+          boxShadow: `0 0 ${lerp(0, 1, Math.sin(freq2 / 255)) * 2.25}rem ${
+            Math.sin(freq2 / 255) * 0.75
+          }rem rgba(222, 222, 222, ${
+            lerp(0, 1, Math.sin(freq2 / 255)) * 0.32
+          })`,
+          border: `${
+            cubicEase(lerp(0, 1, Math.sin(freq2 / 255))) * 0.2
+          }rem solid rgba(255, 255, 255, ${
+            lerp(0, 1, Math.sin(freq1 / 255)) * 1
+          })`,
+        })}
         <div className={styles.headerText}>
           <h1 className={styles.name}>
             <AnimatedText

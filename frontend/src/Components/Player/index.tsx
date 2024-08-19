@@ -13,6 +13,7 @@ import { useUrlStore } from "../../stores/urlStore";
 import { useAudioAnalyser } from "./analyser";
 import "animated-text-letters/index.css";
 import styles from "./styles.module.css";
+import { HandleFallbackImage } from "../../utils/helpers";
 
 const Player: React.FC = () => {
   const {
@@ -127,9 +128,7 @@ const Player: React.FC = () => {
   return (
     <div className={styles.container}>
       <div className={styles.trackInfo}>
-        {cover !== "" && (
-          <img key={cover} src={cover} alt={title} className={styles.cover} />
-        )}
+        {HandleFallbackImage(cover, styles.cover)}
         <div className={styles.text}>
           <span className={styles.title}>
             <AnimatedText
