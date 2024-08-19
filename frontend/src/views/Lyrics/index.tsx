@@ -99,7 +99,7 @@ const LyricsComponent: React.FC = () => {
     <div className={styles.container} ref={containerRef}>
       {pastLines.map((line, index) => (
         <p
-          key={index}
+          key={line.time + index + line.text}
           className={styles.line}
           style={{
             opacity: 0.2,
@@ -110,6 +110,7 @@ const LyricsComponent: React.FC = () => {
         </p>
       ))}
       <p
+        key={currentLine.time}
         style={{
           marginBottom: "8rem",
         }}
