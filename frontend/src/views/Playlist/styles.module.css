@@ -1,0 +1,133 @@
+.container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem;
+  height: calc(100vh - 6rem);
+  overflow-y: scroll;
+}
+
+.header {
+  position: relative;
+  width: 100%;
+  background-color: #060606;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  border-radius: 1rem;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  animation: slideDown 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.bgCover {
+  height: 100%;
+  width: 20%;
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  z-index: 10;
+  filter: blur(2px) opacity(0.32);
+  box-shadow: inset 0rem 0rem 1rem -1rem rgb(22, 22, 22);
+  padding: 0.25rem;
+}
+
+.cover {
+  width: 16rem;
+  height: 16rem;
+  border-radius: 0.5rem;
+  box-shadow: 0rem 0rem 1rem 0.25rem rgba(222, 222, 222, 0.16);
+  margin-right: 2rem;
+  animation: slideUp 0.8s cubic-bezier(0.26, 0.48, 0.44, 0.98) forwards;
+}
+
+.headerText {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.name {
+  font-size: 4rem;
+  font-weight: 900;
+  line-height: 5rem;
+  text-align: start;
+}
+
+.playlist {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 2rem;
+  text-align: start;
+  color: #888;
+  gap: 0.25rem;
+}
+
+.song {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  width: 100%;
+  padding: 0.5rem 1rem;
+  background-color: #060606;
+  border-radius: 0.25rem;
+  opacity: 0;
+  animation: slideUp 0.8s cubic-bezier(0.26, 0.48, 0.44, 0.98) forwards;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.song:hover {
+  color: #ffda0a;
+}
+
+.songCover {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.25rem;
+  margin-right: 0.5rem;
+}
+
+.title {
+  font-size: 1rem;
+  font-weight: 900;
+  line-height: 2rem;
+  text-align: start;
+}
+
+.songName {
+  font-size: 1.1rem;
+  font-weight: 500;
+  text-align: start;
+}
+
+.songArtist {
+  font-size: 0.8rem;
+  font-weight: 300;
+  text-align: start;
+}
+
+.songAlbum {
+  font-size: 1.1rem;
+  font-weight: 500;
+  line-height: 1.8rem;
+  text-align: start;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(1rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0rem);
+  }
+}

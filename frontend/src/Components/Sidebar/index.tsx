@@ -23,7 +23,19 @@ const Sidebar = ({
       >
         Music
       </h1>
-      <div className={styles.button} onClick={() => setCurrentView("home")}>
+      <div
+        className={styles.button}
+        onClick={() => {
+          setCurrentView("home");
+          const searchParams = new URLSearchParams(window.location.search);
+          searchParams.delete("view");
+          window.history.pushState(
+            {},
+            "",
+            `${window.location.pathname}?${searchParams.toString()}`
+          );
+        }}
+      >
         <Home size={22} color={currentView === "home" ? "#ffd000" : "white"} />
         <span
           className={styles.text}
@@ -54,23 +66,30 @@ const Sidebar = ({
       </div>
       <div
         className={styles.button}
-        style={{
-          opacity: 0.3,
+        onClick={() => {
+          setCurrentView("playlists");
+          const searchParams = new URLSearchParams(window.location.search);
+          searchParams.set("view", "playlists");
+          window.history.pushState(
+            {},
+            "",
+            `${window.location.pathname}?${searchParams.toString()}`
+          );
         }}
       >
         <ListMusicIcon
           size={22}
-          color={currentView === "playlist" ? "#ffd000" : "white"}
+          color={currentView === "playlists" ? "#ffd000" : "white"}
         />
         <span
           className={styles.text}
           style={{
             fontSize: "1rem",
-            fontWeight: currentView === "playlist" ? "bold" : 400,
-            color: currentView === "playlist" ? "#ffd000" : "white",
+            fontWeight: currentView === "playlists" ? "bold" : 400,
+            color: currentView === "playlists" ? "#ffd000" : "white",
           }}
         >
-          Playlist
+          Playlists
         </span>
       </div>
       <div className={styles.button} onClick={() => setCurrentView("stats")}>

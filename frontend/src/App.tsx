@@ -10,6 +10,8 @@ import ArtistProfile from "./views/ArtistProfile";
 import Album from "./views/Album";
 import Stats from "./views/Stats";
 import Lyrics from "./views/Lyrics";
+import Playlists from "./views/Playlists";
+import Playlist from "./views/Playlist";
 
 function App() {
   const url = useUrlStore((state) => state.url);
@@ -31,6 +33,10 @@ function App() {
         return <Stats />;
       case "lyrics":
         return <Lyrics />;
+      case "playlists":
+        return <Playlists />;
+      case "playlist":
+        return <Playlist />;
       default:
         return <Home />;
     }
