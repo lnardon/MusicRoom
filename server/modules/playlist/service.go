@@ -3,17 +3,17 @@ package playlist
 import (
 	"database/sql"
 	"encoding/json"
+	"log"
 	"net/http"
-	"strings"
 
 	"github.com/google/uuid"
 )
 
 type Playlist struct {
-	ID     int    `json:"id"`
+	ID     string    `json:"id"`
 	Name   string `json:"name"`
 	Cover  string `json:"cover"`
-	Songs  string `json:"songs"`
+	Songs  []Song `json:"songs"`
 }
 
 func GetAllPlaylistsHandler(w http.ResponseWriter, r *http.Request) {
@@ -24,9 +24,10 @@ func GetAllPlaylistsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	defer db.Close()
 
-	rows, err := db.Query("SELECT id, name, cover, songs FROM Playlists")
+	rows, err := db.Query("SELECT id, name, cover FROM Playlists")
 	if err != nil {
 		http.Error(w, "Failed to get playlists", http.StatusInternalServerError)
+		log.Println(err)
 		return
 	}
 	defer rows.Close()
@@ -34,9 +35,10 @@ func GetAllPlaylistsHandler(w http.ResponseWriter, r *http.Request) {
 	var playlists []Playlist
 	for rows.Next() {
 		var playlist Playlist
-		err = rows.Scan(&playlist.ID, &playlist.Name, &playlist.Cover, &playlist.Songs)
+		err = rows.Scan(&playlist.ID, &playlist.Name, &playlist.Cover)
 		if err != nil {
 			http.Error(w, "Failed to get playlists", http.StatusInternalServerError)
+			log.Println(err)
 			return
 		}
 		playlists = append(playlists, playlist)
@@ -66,6 +68,7 @@ func CreatePlaylistHandler(w http.ResponseWriter, r *http.Request) {
 	_, err = db.Exec("INSERT INTO Playlists (id, name, cover) VALUES (?, ?, ?)", id, playlist.Name, playlist.Cover)
 	if err != nil {
 		http.Error(w, "Failed to insert playlist", http.StatusInternalServerError)
+		log.Println(err)
 		return
 	}
 
@@ -98,20 +101,21 @@ func AddSongToPlaylistHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	defer db.Close()
 
-	playlistId := r.URL.Query().Get("playlist")
-	songId := r.URL.Query().Get("song")
-
-	var playlist Playlist
-	err = db.QueryRow("SELECT id, name, cover, songs FROM Playlists WHERE id = ?", playlistId).Scan(&playlist.ID, &playlist.Name, &playlist.Cover, &playlist.Songs)
+	var data map[string]string
+	err = json.NewDecoder(r.Body).Decode(&data)
 	if err != nil {
-		http.Error(w, "Playlist not found", http.StatusNotFound)
+		http.Error(w, "Failed to decode request", http.StatusBadRequest)
 		return
 	}
 
-	playlist.Songs += "," + songId
-	_, err = db.Exec("UPDATE Playlists SET songs = ? WHERE id = ?", playlist.Songs, playlistId)
+	playlistID := data["playlist_id"]
+	songID := data["song_id"]
+
+
+	_, err = db.Exec("INSERT INTO PlaylistSongs (playlist_id, song_id) VALUES (?, ?)", playlistID, songID)
 	if err != nil {
 		http.Error(w, "Failed to add song to playlist", http.StatusInternalServerError)
+		log.Println(err)
 		return
 	}
 
@@ -126,20 +130,10 @@ func RemoveSongFromPlaylistHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	defer db.Close()
 
-	playlistId := r.URL.Query().Get("playlist")
-	songId := r.URL.Query().Get("song")
+	playlistID := r.URL.Query().Get("playlist_id")
+	songID := r.URL.Query().Get("song_id")
 
-	var playlist Playlist
-	err = db.QueryRow("SELECT id, name, cover, songs FROM Playlists WHERE id = ?", playlistId).Scan(&playlist.ID, &playlist.Name, &playlist.Cover, &playlist.Songs)
-	if err != nil {
-		http.Error(w, "Playlist not found", http.StatusNotFound)
-		return
-	}
-
-	playlist.Songs = playlist.Songs + ","
-	playlist.Songs = strings.Replace(playlist.Songs, ","+songId+",", ",", -1)
-	playlist.Songs = strings.TrimRight(playlist.Songs, ",")
-	_, err = db.Exec("UPDATE Playlists SET songs = ? WHERE id = ?", playlist.Songs, playlistId)
+	_, err = db.Exec("DELETE FROM PlaylistSongs WHERE playlist_id = ? AND song_id = ?", playlistID, songID)
 	if err != nil {
 		http.Error(w, "Failed to remove song from playlist", http.StatusInternalServerError)
 		return
@@ -159,13 +153,50 @@ func GetPlaylistHandler(w http.ResponseWriter, r *http.Request) {
 	id := r.URL.Query().Get("id")
 
 	var playlist Playlist
-	err = db.QueryRow("SELECT id, name, cover, songs FROM Playlists WHERE id = ?", id).Scan(&playlist.ID, &playlist.Name, &playlist.Cover, &playlist.Songs)
+	playlist.ID = id
+
+	rows, err := db.Query(`
+		SELECT s.id, s.title, s.duration, s.track_number, s.release_date, s.path, s.lyrics, s.album,
+			a.title, a.cover, ar.id, ar.name, ar.avatar
+		FROM Songs s
+		INNER JOIN PlaylistSongs ps ON s.id = ps.song_id
+		INNER JOIN Albums a ON s.album = a.id
+		INNER JOIN Artists ar ON a.artist = ar.id
+		WHERE ps.playlist_id = ?`, id)
 	if err != nil {
-		http.Error(w, "Playlist not found", http.StatusNotFound)
+		http.Error(w, "Failed to retrieve playlist songs", http.StatusInternalServerError)
+		return
+	}
+	defer rows.Close()
+
+	var songs []Song
+	for rows.Next() {
+		var song Song
+		err = rows.Scan(&song.ID, &song.Title, &song.Duration, &song.TrackNumber, &song.ReleaseDate, &song.Path, &song.Lyrics, &song.AlbumID,
+			&song.AlbumTitle, &song.AlbumCover, &song.ArtistID, &song.ArtistName, &song.ArtistAvatar)
+		if err != nil {
+			http.Error(w, "Error reading song data", http.StatusInternalServerError)
+			return
+		}
+		songs = append(songs, song)
+	}
+	if err = rows.Err(); err != nil {
+		http.Error(w, "Error iterating song data", http.StatusInternalServerError)
 		return
 	}
 
-	json.NewEncoder(w).Encode(playlist)
+	var playlistName, playlistCover string
+	err = db.QueryRow("SELECT name, cover FROM Playlists WHERE id = ?", id).Scan(&playlistName, &playlistCover)
+	if err != nil {
+		http.Error(w, "Failed to retrieve playlist data", http.StatusInternalServerError)
+		return
+	}
+
+	playlist.Name = playlistName
+	playlist.Cover = playlistCover
+	playlist.Songs = songs
+
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(playlist)
 }
