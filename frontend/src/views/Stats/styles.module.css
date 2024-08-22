@@ -60,7 +60,7 @@
   padding: 0.25rem 0.5rem;
   border-radius: 0.25rem;
   opacity: 0;
-  animation: appear 0.2s ease forwards;
+  animation: slideUp 0.16s ease-in-out forwards;
 }
 
 .stat > div > div:nth-child(even) {
@@ -68,7 +68,22 @@
   padding: 0.25rem 0.5rem;
   border-radius: 0.25rem;
   opacity: 0;
-  animation: appear 0.16s ease forwards;
+  animation: slideUp 0.16s ease-in-out forwards;
+}
+
+.song {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  border: 1px solid transparent;
+  border-left: 0.25rem solid transparent;
+  transition: all 0.2s ease;
+}
+
+.song:hover {
+  border-color: rgba(250, 235, 215, 0.884);
 }
 
 @keyframes appear {
@@ -80,5 +95,17 @@
   to {
     opacity: 1;
     transform: translateX(0%);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(-20%);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
