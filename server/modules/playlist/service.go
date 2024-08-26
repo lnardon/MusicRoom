@@ -200,3 +200,27 @@ func GetPlaylistHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(playlist)
 }
+
+func EditPlaylistInfoHandler(w http.ResponseWriter, r *http.Request) {
+	db, err := sql.Open("sqlite3", "./db/database.db")
+	if err != nil {
+		http.Error(w, "Failed to open database", http.StatusInternalServerError)
+		return
+	}
+	defer db.Close()
+
+	var playlist Playlist
+	err = json.NewDecoder(r.Body).Decode(&playlist)
+	if err != nil {
+		http.Error(w, "Failed to decode request", http.StatusBadRequest)
+		return
+	}
+
+	_, err = db.Exec("UPDATE Playlists SET name = ?, cover = ? WHERE id = ?", playlist.Name, playlist.Cover, playlist.ID)
+	if err != nil {
+		http.Error(w, "Failed to update playlist", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+}

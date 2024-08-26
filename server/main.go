@@ -34,6 +34,7 @@ func main(){
     http.HandleFunc("/addSongToPlaylist", PlaylistModule.AddSongToPlaylistHandler)
     http.HandleFunc("/removeSongFromPlaylist", PlaylistModule.RemoveSongFromPlaylistHandler)
     http.HandleFunc("/getPlaylist", PlaylistModule.GetPlaylistHandler)
+    http.HandleFunc("/editPlaylist", PlaylistModule.EditPlaylistInfoHandler)
 
     http.HandleFunc("/getHistory", StatsModule.GetHistoryHandler)
     http.HandleFunc("/getStats", StatsModule.GetStatsHandler)
