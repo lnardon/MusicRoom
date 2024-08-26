@@ -28,7 +28,7 @@
   top: 0px;
   right: 0px;
   z-index: 10;
-  filter: blur(2px) opacity(0.32);
+  filter: blur(2px) opacity(1);
   box-shadow: inset 0rem 0rem 1rem -1rem rgb(22, 22, 22);
   padding: 0.25rem;
 }
@@ -120,6 +120,7 @@
   display: flex;
   justify-content: flex-end;
   flex: 1;
+  margin-right: 2rem;
 }
 
 @keyframes slideUp {

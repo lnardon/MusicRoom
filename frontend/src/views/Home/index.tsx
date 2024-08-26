@@ -1,12 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect } from "react";
-
 import { usePlayerStore } from "../../stores/playerStore";
 import { useUrlStore } from "../../stores/urlStore";
-
-import styles from "./styles.module.css";
 import AnimatedText from "animated-text-letters";
 import { HandleFallbackImage } from "../../utils/helpers";
+import OptionsMenu from "../../Components/OptionsMenu";
+import styles from "./styles.module.css";
 
 const Home: React.FC = () => {
   const [recentlyPlayed, setRecentlyPlayed] = useState([]);
@@ -140,12 +139,15 @@ const Home: React.FC = () => {
             }}
             className={styles.track}
             onClick={() => handleClick(track)}
+            onContextMenu={(e) => {
+              e.preventDefault();
+            }}
           >
             {HandleFallbackImage(`/getCover?file=${track.album}`, "", null, {
               width: "2rem",
               height: "2rem",
               borderRadius: "0.25rem",
-              marginRight: "1rem",
+              marginRight: "0.5rem",
             })}
             <p
               style={{
@@ -154,6 +156,9 @@ const Home: React.FC = () => {
             >
               {track.title}
             </p>
+            <div onClick={(e) => e.stopPropagation()}>
+              <OptionsMenu trackId={track.id} />
+            </div>
           </div>
         ))}
       </div>

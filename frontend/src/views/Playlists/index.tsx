@@ -78,23 +78,32 @@ const Playlists = () => {
         </button>
       </div>
 
-      {playlists?.map((playlist, index) => (
-        <div
-          className={styles.playlist}
-          key={playlist.id}
-          style={{
-            animationDelay: `${index * 64}ms`,
-          }}
-          onClick={() => handleClick(playlist.id)}
-        >
-          <img
-            className={styles.cover}
-            src={playlist.cover}
-            alt="playlist cover"
-          />
-          <h3 className={styles.playlistName}>{playlist.name}</h3>
-        </div>
-      ))}
+      <div
+        style={{
+          width: "100%",
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fill, minmax(16rem, 1fr))",
+          gap: "1rem",
+        }}
+      >
+        {playlists?.map((playlist, index) => (
+          <div
+            className={styles.playlist}
+            key={playlist.id}
+            style={{
+              animationDelay: `${index * 64}ms`,
+            }}
+            onClick={() => handleClick(playlist.id)}
+          >
+            <img
+              className={styles.cover}
+              src={playlist.cover}
+              alt="playlist cover"
+            />
+            <h3 className={styles.playlistName}>{playlist.name}</h3>
+          </div>
+        ))}
+      </div>
 
       {isModalOpen && (
         <div className={styles.modal}>

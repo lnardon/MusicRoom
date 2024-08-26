@@ -1,6 +1,7 @@
 import { create } from "zustand";
 
 interface Song {
+  id?: string;
   cover: string;
   file: string;
   title: string;
@@ -34,6 +35,7 @@ interface PlayerState {
 
 export const usePlayerStore = create<PlayerState>()((set) => ({
   song: {
+    id: "",
     cover: "",
     file: "",
     title: "",

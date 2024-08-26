@@ -10,7 +10,7 @@ import { HandleFallbackImage } from "../../utils/helpers";
 
 const Stats: React.FC = () => {
   const setUrl = useUrlStore((state) => state.setUrl);
-  const { setSong, setIsPlaying, song } = usePlayerStore();
+  const { setSong, setIsPlaying } = usePlayerStore();
   const [stats, setStats] = useState<any>({});
 
   useEffect(() => {
@@ -140,7 +140,7 @@ const Stats: React.FC = () => {
           <h2>Songs</h2>
           <div className={styles.list}>
             {stats.songs &&
-              stats.songs.map((song1: any, index: any) => (
+              stats.songs.map((song: any, index: any) => (
                 <div
                   className={styles.song}
                   style={{
@@ -148,10 +148,10 @@ const Stats: React.FC = () => {
                   }}
                   onClick={() => {
                     setSong({
-                      title: song1.title,
-                      artist: song1.artist,
-                      cover: `/getCover?file=${song1.album.id}`,
-                      file: `/getSong?file=${song1.id}`,
+                      title: song.title,
+                      artist: song.artist,
+                      cover: `/getCover?file=${song.album.id}`,
+                      file: `/getSong?file=${song.id}`,
                     });
                     setIsPlaying(true);
                   }}
@@ -164,7 +164,7 @@ const Stats: React.FC = () => {
                     }}
                   >
                     {HandleFallbackImage(
-                      `/getCover?file=${song1.album.id}`,
+                      `/getCover?file=${song.album.id}`,
                       styles.songCover,
                       null,
                       {
@@ -177,14 +177,10 @@ const Stats: React.FC = () => {
                     <p
                       style={{
                         textAlign: "left",
-                        color:
-                          song.id === song1.id ? "#ffd000 !important" : "white",
-                        fontWeight:
-                          song.id === song1.id ? "400 !important" : "300",
                       }}
                       key={index}
                     >
-                      {song1.title}
+                      {song.title}
                     </p>
                   </div>
                   <div
@@ -193,16 +189,13 @@ const Stats: React.FC = () => {
                       alignItems: "center",
                       justifyContent: "flex-end",
                       fontSize: "0.8rem",
-                      color: song.id === song1.id ? "#ffd000" : "white",
-                      fontWeight: song.id === song1.id ? "400" : "300",
                     }}
                   >
-                    <p>{song1.plays}</p>
+                    <p>{song.plays}</p>
                     <PlayIcon
                       size={10}
                       style={{
                         marginLeft: "0.25rem",
-                        color: song.id === song1.id ? "#ffd000" : "white",
                       }}
                     />
                   </div>
