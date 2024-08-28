@@ -10,16 +10,15 @@
 
 .albums {
   width: 100%;
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
   text-align: flex-start;
-  flex-wrap: wrap;
-  justify-content: flex-start;
   gap: 0.5rem;
   padding: 1rem 2rem 1rem 2rem;
 }
 
 .album {
-  width: 12rem;
+  width: 100%;
   background-color: rgba(0, 0, 0, 0.64);
   padding: 0.5rem;
   border-radius: 0.5rem;
