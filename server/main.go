@@ -20,6 +20,7 @@ func main(){
     
     http.HandleFunc("/scan", Utils.ScanHandler)
     http.HandleFunc("/getAllFiles", Utils.GetAllFilesHandler)
+    http.HandleFunc("/getAllSongs", SongModule.GetAllSongsHandler)
     http.HandleFunc("/getAllArtists", ArtistModule.GetAllArtistsHandler)
     http.HandleFunc("/getAllAlbums", AlbumModule.GetAllAlbumsHandler)
 
