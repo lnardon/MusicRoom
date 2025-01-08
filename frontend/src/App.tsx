@@ -1,6 +1,4 @@
 import { useEffect, useState } from "react";
-import "./App.css";
-
 import { useUrlStore } from "./stores/urlStore";
 import Sidebar from "./Components/Sidebar";
 import Player from "./Components/Player";
@@ -12,6 +10,7 @@ import Stats from "./views/Stats";
 import Lyrics from "./views/Lyrics";
 import Playlists from "./views/Playlists";
 import Playlist from "./views/Playlist";
+import "./App.css";
 
 function App() {
   const url = useUrlStore((state) => state.url);
@@ -49,13 +48,7 @@ function App() {
 
   return (
     <div>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          height: "100vh",
-        }}
-      >
+      <div className="views">
         <Sidebar currentView={currentView} setCurrentView={setCurrentView} />
         {getView()}
       </div>

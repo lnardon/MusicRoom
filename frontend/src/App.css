@@ -9,3 +9,9 @@
   margin: 0;
   padding: 0;
 }
+
+.views {
+  display: flex;
+  flex-direction: row;
+  height: 100vh;
+}
