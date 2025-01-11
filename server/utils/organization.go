@@ -21,7 +21,7 @@ func ScanHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	defer db.Close()
 
-	files, err := GetAllFilesInPath("/media/lucas/HDD1/Music/")
+	files, err := GetAllFilesInPath("/media/dony/HDD/Music")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -56,7 +56,7 @@ func ScanHandler(w http.ResponseWriter, r *http.Request) {
 
 		fileDurationSeconds := streamer.Len() / format.SampleRate.N(time.Second)
 		formatedDuration := fmt.Sprintf("%02d:%02d", fileDurationSeconds/60, fileDurationSeconds%60)
-		
+
 		artistID, albumID := "", ""
 		artistName := strings.Split(tag.Artist(), "/")[0]
 		albumTitle := tag.Album()
@@ -98,7 +98,7 @@ func ScanHandler(w http.ResponseWriter, r *http.Request) {
 				log.Println("Error inserting song:", err)
 				continue
 			}
-			log.Println("Inserted song with ID:", songID,"Title:", songTitle)
+			log.Println("Inserted song with ID:", songID, "Title:", songTitle)
 		} else {
 			if path != file {
 				log.Println("Song path has changed, updating path...")
@@ -116,11 +116,10 @@ func ScanHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Done"))
 }
 
-
 // This function updates the artists string in the MP3 files metadata to use a ; as separator instead of a /
 // Example: "Artist1/Artist2" -> "Artist1;Artist2"
 func UpdateArtistsString(path string) {
-	files,err := GetAllFilesInPath(path)
+	files, err := GetAllFilesInPath(path)
 	if err != nil {
 		log.Println("Error getting files in path:", err)
 		return
@@ -139,5 +138,5 @@ func UpdateArtistsString(path string) {
 			tag.SetArtist(strings.Join(strings.Split(artist, "/"), ";"))
 		}
 	}
-	
+
 }
