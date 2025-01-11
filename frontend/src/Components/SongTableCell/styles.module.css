@@ -1,0 +1,66 @@
+.container {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  width: 100%;
+  padding: 0.25rem;
+  font-weight: 400;
+  cursor: pointer;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  margin-bottom: 0.25rem;
+  transition: all 0.3s ease;
+  border: 1px solid transparent;
+  opacity: 0;
+  background-color: rgba(23, 23, 23, 1);
+  animation: appear 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+.container:nth-child(odd) {
+  background-color: rgba(23, 23, 23, 0.44);
+}
+
+.container:hover {
+  box-shadow: 0 0 1rem 0.25rem rgba(0, 0, 0, 0.16);
+  border-color: #f1f1f1cc;
+}
+
+.textContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  margin-left: 0.25rem;
+}
+
+.title {
+  width: 100%;
+  font-size: 1rem;
+  font-weight: 600;
+  text-align: start;
+}
+
+.artist {
+  width: 100%;
+  font-size: 0.75rem;
+  font-weight: 300;
+  opacity: 0.72;
+  text-align: start;
+}
+
+.artist:hover {
+  text-decoration: underline;
+  color: #ffd000;
+}
+
+@keyframes appear {
+  from {
+    opacity: 0;
+    transform: translateY(20%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
