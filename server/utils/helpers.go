@@ -10,7 +10,7 @@ import (
 	Types "server/types"
 )
 
-const FOLDER_PATH = "/media/dony/HDD/Music"
+var FOLDER_PATH string = os.Getenv("MUSIC_PATH")
 
 func GetAllFilesInPath(path string) ([]string, error) {
 	var files []string
