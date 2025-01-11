@@ -7,14 +7,14 @@ import {
   Dices,
   SkipForward,
   SkipBack,
-  MicVocal,
+  // MicVocal,
 } from "lucide-react";
 import { usePlayerStore } from "../../stores/playerStore";
 import { useUrlStore } from "../../stores/urlStore";
 import { useAudioAnalyser } from "./analyser";
 import "animated-text-letters/index.css";
 import styles from "./styles.module.css";
-import { HandleFallbackImage, urlHistoryHandler } from "../../utils/helpers";
+import { HandleFallbackImage } from "../../utils/helpers";
 
 const Player: React.FC = () => {
   const {
@@ -139,6 +139,11 @@ const Player: React.FC = () => {
               easing="ease"
               transitionOnlyDifferentLetters={true}
               animationDuration={800}
+              style={{
+                display: "flex",
+                alignItems: "flex-start",
+                flexWrap: "wrap",
+              }}
             />
           </span>
           <span
@@ -152,12 +157,17 @@ const Player: React.FC = () => {
               easing="ease"
               transitionOnlyDifferentLetters={true}
               animationDuration={700}
+              style={{
+                display: "flex",
+                alignItems: "flex-start",
+                flexWrap: "wrap",
+              }}
             />
           </span>
         </div>
       </div>
 
-      <div>
+      <div className={styles.controlsContainer}>
         <div className={styles.controls}>
           <button>
             <Repeat2
@@ -241,7 +251,7 @@ const Player: React.FC = () => {
       </div>
 
       <div className={styles.volume}>
-        <MicVocal
+        {/* <MicVocal
           size={20}
           strokeWidth={2}
           style={{
@@ -267,7 +277,7 @@ const Player: React.FC = () => {
 
             urlHistoryHandler("view", "lyrics", setUrl);
           }}
-        />
+        /> */}
 
         <svg
           xmlns="http://www.w3.org/2000/svg"

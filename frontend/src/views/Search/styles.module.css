@@ -8,14 +8,6 @@
   padding: 2rem;
 }
 
-.title {
-  font-size: 3rem;
-  font-weight: 900;
-  margin-bottom: 0.5rem;
-  display: flex;
-  align-items: flex-start;
-}
-
 .input {
   width: 100%;
   padding: 1rem;
@@ -33,13 +25,14 @@
   margin-bottom: 1rem;
   gap: 0.5rem;
   border-bottom: 1px solid antiquewhite;
+  padding-bottom: 0.5rem;
 }
 
 .tab {
   padding: 0.5rem 1rem;
   font-size: 1rem;
   font-weight: 600;
-  border-radius: 0.25rem;
+  border-radius: 0.25rem 0.25rem 0 0;
   cursor: pointer;
   transition: all 0.3s ease;
   border: 1px solid #cccccc69;
@@ -49,21 +42,20 @@
 
 .artistsContainer {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(8rem, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
   width: 100%;
-  gap: 2rem;
+  gap: 0.5rem;
 }
 
 .artist {
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  width: 100%;
+  gap: 0.5rem;
   cursor: pointer;
   transition: all 0.2s ease;
   border-radius: 0.5rem;
-  padding: 0.5rem;
+  padding: 0.25rem;
 }
 
 .artist:hover {
@@ -72,9 +64,19 @@
 }
 
 .avatar {
-  width: 100%;
+  width: 2rem;
+  height: 2rem;
   border-radius: 50%;
-  margin-bottom: 0.5rem;
+}
+
+.artistName {
+  width: 100%;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: start;
+  overflow: hidden;
+  font-size: 1rem;
+  font-weight: 400;
 }
 
 .track {
@@ -106,4 +108,26 @@
   justify-content: flex-end;
   flex: 1;
   margin-right: 2rem;
+}
+
+.albumCover {
+  width: 100%;
+  margin-bottom: 0.5rem;
+  border-radius: 0.5rem;
+}
+
+.albumsContainer {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
+  width: 100%;
+  gap: 0.5rem;
+}
+
+.album {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  cursor: pointer;
 }
