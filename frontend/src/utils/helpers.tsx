@@ -25,3 +25,18 @@ export function HandleFallbackImage(
     </object>
   );
 }
+
+export function urlHistoryHandler(
+  key: string,
+  value: string,
+  setUrl: (url: string) => void
+) {
+  const searchParams = new URLSearchParams(window.location.search);
+  searchParams.set(key, searchParams.get(key) === value ? "" : value);
+  window.history.pushState(
+    {},
+    "",
+    `${window.location.pathname}?${searchParams.toString()}`
+  );
+  setUrl(window.location.search);
+}
