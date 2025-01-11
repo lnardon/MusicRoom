@@ -9,13 +9,6 @@ import (
 	"github.com/google/uuid"
 )
 
-type Playlist struct {
-	ID     string    `json:"id"`
-	Name   string `json:"name"`
-	Cover  string `json:"cover"`
-	Songs  []Song `json:"songs"`
-}
-
 func GetAllPlaylistsHandler(w http.ResponseWriter, r *http.Request) {
 	db, err := sql.Open("sqlite3", "./db/database.db")
 	if err != nil {

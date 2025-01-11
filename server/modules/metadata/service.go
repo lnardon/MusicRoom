@@ -6,22 +6,13 @@ import (
 	"log"
 	"net/http"
 
+	Types "server/types"
+
 	"github.com/bogem/id3v2"
 )
 
-
-type FileMeta struct {
-	ID          string `json:"id"`
-	Title       string `json:"title"`
-	Artist      string `json:"artist"`
-	Album       string `json:"album"`
-	TrackNumber string `json:"track_number"`
-	ReleaseDate string `json:"release_date"`
-	Lyrics      string `json:"lyrics"`
-}
-
 func UpdateFileMetadataHandler(w http.ResponseWriter, r *http.Request) {
-	var req FileMeta
+	var req Types.FileMeta
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, "Error parsing JSON body", http.StatusBadRequest)
 		return

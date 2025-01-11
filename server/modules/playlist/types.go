@@ -1,5 +1,11 @@
 package playlist
 
+type Playlist struct {
+	ID     string    `json:"id"`
+	Name   string `json:"name"`
+	Cover  string `json:"cover"`
+	Songs  []Song `json:"songs"`
+}
 type Song struct {
 	ID           string `json:"id"`
 	Title        string `json:"title"`

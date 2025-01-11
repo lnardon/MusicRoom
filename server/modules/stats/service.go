@@ -213,7 +213,7 @@ func GetHistoryHandler(w http.ResponseWriter, r *http.Request) {
     }
     defer db.Close()
 
-    rows, err := db.Query(`SELECT s.id, s.title, a.name AS artist_name, al.id AS album_id, al.title AS album_title, s.path, s.duration, s.track_number 
+    rows, err := db.Query(`SELECT s.id, s.title, a.name AS artist_name, a.id AS artist_id, al.id AS album_id, al.title AS album_title, s.path, s.duration, s.track_number 
                            FROM History h 
                            JOIN Songs s ON h.song = s.id 
                            JOIN Albums al ON s.album = al.id 
@@ -233,7 +233,7 @@ func GetHistoryHandler(w http.ResponseWriter, r *http.Request) {
         var song Types.Song
         var albumTitle string
 
-        if err := rows.Scan(&song.ID, &song.Title, &song.Artist, &song.Album, &albumTitle, &song.Path, &song.Duration, &song.TrackNumber); err != nil {
+        if err := rows.Scan(&song.ID, &song.Title, &song.Artist.Name, &song.Artist.ID, &song.Album, &albumTitle, &song.Path, &song.Duration, &song.TrackNumber); err != nil {
             http.Error(w, "Failed to scan row", http.StatusInternalServerError)
             log.Printf("Error scanning row: %v", err)
             return
@@ -248,7 +248,10 @@ func GetHistoryHandler(w http.ResponseWriter, r *http.Request) {
                 Title: albumTitle,
                 Cover: "",
                 ReleaseDate: "",
-                Artist: song.Artist,
+                Artist: Types.SimpleArtistInfo{
+                    ID: song.Artist.ID,
+                    Name: song.Artist.Name,
+                },
                 Songs: nil,
             }
         }

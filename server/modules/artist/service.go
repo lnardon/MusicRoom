@@ -9,11 +9,6 @@ import (
 	Types "server/types"
 )
 
-type SimpleArtist struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
-}
-
 func GetAllArtistsHandler(w http.ResponseWriter, r *http.Request) {
     db, err := sql.Open("sqlite3", "./db/database.db")
     if err != nil {
@@ -29,9 +24,9 @@ func GetAllArtistsHandler(w http.ResponseWriter, r *http.Request) {
     }
     defer rows.Close()
 
-    var artists []SimpleArtist
+    var artists []Types.SimpleArtistInfo
     for rows.Next() {
-        var artist SimpleArtist
+        var artist Types.SimpleArtistInfo
         if err := rows.Scan(&artist.ID, &artist.Name); err != nil {
             http.Error(w, "Failed to scan row", http.StatusInternalServerError)
             return
@@ -92,7 +87,7 @@ func GetArtistHandler(w http.ResponseWriter, r *http.Request) {
 			placeholders[i] = "?"
 		}
 		placeholdersStr := strings.Join(placeholders, ",")
-		query := `SELECT s.id, s.title, s.duration, s.track_number, a.name, al.title FROM Songs s 
+		query := `SELECT s.id, s.title, s.duration, s.track_number, a.id, a.name, al.title FROM Songs s 
 				  JOIN Albums al ON s.album = al.id
 				  JOIN Artists a ON al.artist = a.id
 				  WHERE al.id IN (` + placeholdersStr + `) ORDER BY RANDOM() LIMIT 5`
@@ -111,7 +106,7 @@ func GetArtistHandler(w http.ResponseWriter, r *http.Request) {
 
 		for songsRows.Next() {
 			var song Types.Song
-			if err := songsRows.Scan(&song.ID, &song.Title, &song.Duration, &song.TrackNumber, &song.Artist, &song.Album); err != nil {
+			if err := songsRows.Scan(&song.ID, &song.Title, &song.Duration, &song.TrackNumber, &song.Artist.ID, &song.Artist.Name, &song.Album); err != nil {
 				http.Error(w, "Error scanning songs", http.StatusInternalServerError)
 				return
 			}

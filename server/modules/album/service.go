@@ -28,14 +28,14 @@ func GetAllAlbumsHandler(w http.ResponseWriter, r *http.Request){
     }
     defer rows.Close()
 
-    var albums []string
+    var albums []Types.Album
     for rows.Next() {
         var id, title, cover, releaseDate, songs string
         if err := rows.Scan(&id, &title, &cover, &releaseDate, &songs); err != nil {
             http.Error(w, "Failed to scan row", http.StatusInternalServerError)
             return
         }
-        albums = append(albums, title)
+        albums = append(albums, Types.Album{ID: id, Title: title, Cover: cover, ReleaseDate: releaseDate})
     }
 
     jsonResponse, err := json.Marshal(albums)
@@ -82,16 +82,7 @@ func GetAlbumHandler(w http.ResponseWriter, r *http.Request){
     }
     defer songsRows.Close()
 
-    var albumInfo struct {
-        ID     string `json:"id"`
-        Title  string `json:"title"`
-        Cover  string `json:"cover"`
-        Artist struct {
-            ID   string `json:"id"`
-            Name string `json:"name"`
-        } `json:"artist"`
-        Songs []Types.Song `json:"songs"`
-    }
+    var albumInfo Types.AlbumInfo
     albumInfo.Title = albumTitle
     albumInfo.ID = album
     albumInfo.Cover = "/album_covers/cover_" + album + ".jpg"
