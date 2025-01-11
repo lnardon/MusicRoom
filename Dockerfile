@@ -1,15 +1,19 @@
-FROM node:latest as build-frontend
+FROM node:latest AS build-frontend
 WORKDIR /usr/src/app
-COPY ./frontend/ .
+COPY ./frontend/ ./
 RUN npm install
 RUN npm run build
 
-FROM golang:latest as build-backend
-WORKDIR /usr/src/app
-COPY . .
+FROM golang:latest AS build-backend
+WORKDIR /usr/src/app/server
+COPY ./server/go.* ./
+RUN go mod download
+COPY ./server .
 COPY --from=build-frontend /usr/src/app/dist /usr/src/app/frontend/dist
 RUN go build -o main .
-ENV MUSIC_PATH="/usr/Music"
-EXPOSE 7777
 
+RUN mkdir -p /Music
+ENV MUSIC_PATH="/Music"
+
+EXPOSE 7777
 CMD ["./main"]

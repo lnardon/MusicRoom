@@ -21,7 +21,7 @@ func ScanHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	defer db.Close()
 
-	files, err := GetAllFilesInPath("/media/dony/HDD/Music")
+	files, err := GetAllFilesInPath(FOLDER_PATH)
 	if err != nil {
 		log.Fatal(err)
 	}
