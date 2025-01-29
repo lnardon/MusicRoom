@@ -26,11 +26,15 @@ func ScanHandler(w http.ResponseWriter, r *http.Request) {
 		log.Fatal(err)
 	}
 
+	unable_to_open := make([]string, 0)
+	error_decoding := make([]string, 0)
+
 	for idx, file := range files {
 		fmt.Println("Processing file:", idx, "of", len(files))
 		tag, err := id3v2.Open(file, id3v2.Options{Parse: true})
 		if err != nil {
-			log.Println("Error opening MP3 file:", err)
+			log.Println("Error opening MP3 file:", err, file)
+			unable_to_open = append(unable_to_open, file)
 			continue
 		}
 		defer tag.Close()
@@ -45,11 +49,9 @@ func ScanHandler(w http.ResponseWriter, r *http.Request) {
 		streamer, format, err := mp3.Decode(f)
 		if err != nil {
 			fmt.Println("@#@#@#@#@#@#@#@#@#@#@#@#@#@#")
+			fmt.Println("Error decoding file: =====> ", file, err)
 			fmt.Println("@#@#@#@#@#@#@#@#@#@#@#@#@#@#")
-			fmt.Println(err, "Error decoding file: =====> ", file)
-			fmt.Println(err)
-			fmt.Println("@#@#@#@#@#@#@#@#@#@#@#@#@#@#")
-			fmt.Println("@#@#@#@#@#@#@#@#@#@#@#@#@#@#")
+			error_decoding = append(error_decoding, file)
 			continue
 		}
 		defer streamer.Close()
@@ -113,30 +115,16 @@ func ScanHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	log.Println("\n\nUnable to open the files: ")
+	for idx, file := range unable_to_open {
+		fmt.Printf("%d - %s\n",idx, file)
+	}
+
+	log.Println("\n\nThere was an error decoding the tag info from the files: ")
+	for idx, file := range error_decoding {
+		fmt.Printf("%d - %s\n",idx, file)
+	}
+
 	w.Write([]byte("Done"))
 }
 
-// This function updates the artists string in the MP3 files metadata to use a ; as separator instead of a /
-// Example: "Artist1/Artist2" -> "Artist1;Artist2"
-func UpdateArtistsString(path string) {
-	files, err := GetAllFilesInPath(path)
-	if err != nil {
-		log.Println("Error getting files in path:", err)
-		return
-	}
-
-	for _, file := range files {
-		tag, err := id3v2.Open(file, id3v2.Options{Parse: true})
-		if err != nil {
-			log.Println("Error opening MP3 file:", err)
-			continue
-		}
-		defer tag.Close()
-
-		artist := tag.Artist()
-		if artist != "" {
-			tag.SetArtist(strings.Join(strings.Split(artist, "/"), ";"))
-		}
-	}
-
-}
