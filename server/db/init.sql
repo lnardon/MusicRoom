@@ -1,3 +1,10 @@
+CREATE TABLE `Users`(
+    `id` CHAR(36) NOT NULL,
+    `username` TEXT NOT NULL,
+    `password` TEXT NOT NULL,
+    `created_at` TIMESTAMP NOT NULL,
+    PRIMARY KEY(`id`)
+);
 CREATE TABLE `Artists`(
     `id` CHAR(36) NOT NULL,
     `name` TEXT NOT NULL,

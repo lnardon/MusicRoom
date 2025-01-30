@@ -6,7 +6,7 @@ import (
 
 	AlbumModule "server/modules/album"
 	ArtistModule "server/modules/artist"
-	MetadataModule "server/modules/metadata"
+	Auth "server/modules/auth"
 	PlaylistModule "server/modules/playlist"
 	SongModule "server/modules/song"
 	StatsModule "server/modules/stats"
@@ -17,6 +17,9 @@ import (
 
 func main() {
 	http.Handle("/", http.FileServer(http.Dir("../frontend/dist")))
+
+	http.HandleFunc("/api/login", Auth.HandleLogin)
+	http.HandleFunc("/api/signup", Auth.HandleSignUp)
 
 	http.HandleFunc("/api/scan", Utils.ScanHandler)
 	http.HandleFunc("/api/getAllFiles", Utils.GetAllFilesHandler)
@@ -39,8 +42,6 @@ func main() {
 
 	http.HandleFunc("/api/getHistory", StatsModule.GetHistoryHandler)
 	http.HandleFunc("/api/getStats", StatsModule.GetStatsHandler)
-
-	http.HandleFunc("/api/editMetadata", MetadataModule.UpdateFileMetadataHandler)
 
 	PORT := ":7777"
 	fmt.Printf("\nServer starting on port %s\n", PORT)
