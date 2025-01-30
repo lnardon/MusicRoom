@@ -29,30 +29,30 @@ const Album: React.FC = () => {
           .map((t) => ({
             title: t.title,
             artist: artist,
-            cover: `/getCover?file=${albumId}`,
-            file: `/getSong?file=${t.id}`,
+            cover: `/api/getCover?file=${albumId}`,
+            file: `/api/getSong?file=${t.id}`,
           }))
       : tracks
           .slice(tracks.findIndex((t) => t.title === track.title) + 1)
           .map((t) => ({
             title: t.title,
             artist: artist,
-            cover: `/getCover?file=${albumId}`,
-            file: `/getSong?file=${t.id}`,
+            cover: `/api/getCover?file=${albumId}`,
+            file: `/api/getSong?file=${t.id}`,
           }));
 
     setQueue(newQueue);
     setSong({
       title: track.title,
       artist: artist,
-      cover: `/getCover?file=${albumId}`,
-      file: `/getSong?file=${track.id}`,
+      cover: `/api/getCover?file=${albumId}`,
+      file: `/api/getSong?file=${track.id}`,
     });
     setIsPlaying(true);
   }
 
   function handleAddToBlackCrow(track: Track) {
-    fetch("/addSongToPlaylist", {
+    fetch("/api/addSongToPlaylist", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -70,11 +70,11 @@ const Album: React.FC = () => {
 
   useEffect(() => {
     document.title = albumName || "Album";
-    fetch(`/getAlbum?album=${encodeURI(albumId)}`)
+    fetch(`/api/getAlbum?album=${encodeURI(albumId)}`)
       .then((res) => res.json())
       .then((data) => {
         setArtist(data.artist);
-        setCover(`/getCover?file=${albumId}`);
+        setCover(`/api/getCover?file=${albumId}`);
         setTracks(data.songs);
         setAlbumName(data.title);
       });

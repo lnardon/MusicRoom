@@ -40,8 +40,8 @@ const Playlist: React.FC = () => {
         name: track.artist_name,
         id: track.artist_id,
       },
-      cover: `/getCover?file=${track.album_id}`,
-      file: `/getSong?file=${track.id}`,
+      cover: `/api/getCover?file=${track.album_id}`,
+      file: `/api/getSong?file=${track.id}`,
     });
     setIsPlaying(true);
   }
@@ -56,8 +56,8 @@ const Playlist: React.FC = () => {
         name: shuffledQueue[0].artist_name,
         id: shuffledQueue[0].artist_id,
       },
-      cover: `/getCover?file=${shuffledQueue[0].album_id}`,
-      file: `/getSong?file=${shuffledQueue[0].id}`,
+      cover: `/api/getCover?file=${shuffledQueue[0].album_id}`,
+      file: `/api/getSong?file=${shuffledQueue[0].id}`,
     });
     setIsPlaying(true);
     setQueue(
@@ -68,14 +68,14 @@ const Playlist: React.FC = () => {
           name: song.artist_name,
           id: song.artist_id,
         },
-        cover: `/getCover?file=${song.album_id}`,
-        file: `/getSong?file=${song.id}`,
+        cover: `/api/getCover?file=${song.album_id}`,
+        file: `/api/getSong?file=${song.id}`,
       }))
     );
   }
 
   function handleSaveEdit() {
-    fetch("/editPlaylist", {
+    fetch("/api/editPlaylist", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -90,7 +90,7 @@ const Playlist: React.FC = () => {
       if (res.status === 200) {
         setIsModalOpen(false);
         fetch(
-          `/getPlaylist?id=${
+          `/api/getPlaylist?id=${
             new URLSearchParams(window.location.search).get("playlist") || ""
           }`
         )
@@ -104,7 +104,7 @@ const Playlist: React.FC = () => {
 
   useEffect(() => {
     fetch(
-      `/getPlaylist?id=${
+      `/api/getPlaylist?id=${
         new URLSearchParams(window.location.search).get("playlist") || ""
       }`
     )

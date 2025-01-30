@@ -11,7 +11,7 @@ const OptionsMenu = ({ trackId }: { trackId: string }) => {
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   function fetchPlaylists() {
-    fetch("/getAllPlaylists")
+    fetch("/api/getAllPlaylists")
       .then((res) => res.json())
       .then((data) => {
         setPlaylists(data);
@@ -19,7 +19,7 @@ const OptionsMenu = ({ trackId }: { trackId: string }) => {
   }
 
   function handleAddToPlaylist(playlist_id: string) {
-    fetch("/addSongToPlaylist", {
+    fetch("/api/addSongToPlaylist", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

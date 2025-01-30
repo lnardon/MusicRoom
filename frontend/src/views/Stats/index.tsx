@@ -14,7 +14,7 @@ const Stats: React.FC = () => {
   const [stats, setStats] = useState<any>({});
 
   useEffect(() => {
-    fetch(`/getStats`).then((res) => {
+    fetch(`/api/getStats`).then((res) => {
       res.json().then((data) => {
         setStats(data);
       });
@@ -113,7 +113,7 @@ const Stats: React.FC = () => {
                     }}
                   >
                     {HandleFallbackImage(
-                      `/getCover?file=${album.id}`,
+                      `/api/getCover?file=${album.id}`,
                       styles.albumCover,
                       null,
                       {
@@ -150,8 +150,8 @@ const Stats: React.FC = () => {
                     setSong({
                       title: song.title,
                       artist: song.artist,
-                      cover: `/getCover?file=${song.album.id}`,
-                      file: `/getSong?file=${song.id}`,
+                      cover: `/api/getCover?file=${song.album.id}`,
+                      file: `/api/getSong?file=${song.id}`,
                     });
                     setIsPlaying(true);
                   }}
@@ -164,7 +164,7 @@ const Stats: React.FC = () => {
                     }}
                   >
                     {HandleFallbackImage(
-                      `/getCover?file=${song.album.id}`,
+                      `/api/getCover?file=${song.album.id}`,
                       styles.songCover,
                       null,
                       {

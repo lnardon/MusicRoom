@@ -20,7 +20,7 @@ const Playlists = () => {
   const [playlistCover, setPlaylistCover] = useState("");
 
   function createPlaylist() {
-    fetch("/createPlaylist", {
+    fetch("/api/createPlaylist", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -53,7 +53,7 @@ const Playlists = () => {
   }
 
   useEffect(() => {
-    fetch("/getAllPlaylists")
+    fetch("/api/getAllPlaylists")
       .then((res) => res.json())
       .then((data) => {
         setPlaylists(data);

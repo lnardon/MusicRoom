@@ -40,7 +40,7 @@ const SongTableCell = ({
       onClick={() => handleClick(track)}
       onContextMenu={() => { }}
     >
-      {HandleFallbackImage(`/getCover?file=${track.album}`, "", null, {
+      {HandleFallbackImage(`/api/getCover?file=${track.album}`, "", null, {
         width: "2.5rem",
         height: "2.5rem",
         borderRadius: "0.25rem",

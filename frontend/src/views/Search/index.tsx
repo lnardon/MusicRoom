@@ -22,7 +22,7 @@ const Home = () => {
   useEffect(() => {
     setLoading(true);
     if (view === "artists") {
-      fetch("/getAllArtists")
+      fetch("/api/getAllArtists")
         .then((res) => res.json())
         .then((data) => {
           setArtists(data);
@@ -33,7 +33,7 @@ const Home = () => {
     }
 
     if (view === "songs") {
-      fetch("/getAllSongs")
+      fetch("/api/getAllSongs")
         .then((res) => res.json())
         .then((data) => {
           setSongs(data);
@@ -44,7 +44,7 @@ const Home = () => {
     }
 
     if (view === "albums") {
-      fetch("/getAllAlbums")
+      fetch("/api/getAllAlbums")
         .then((res) => res.json())
         .then((data) => {
           setAlbums(data);
@@ -76,10 +76,10 @@ const Home = () => {
 
   function handleGetSong(song: Track) {
     setSong({
-      file: `/getSong?file=${song.id}`,
+      file: `/api/getSong?file=${song.id}`,
       title: song.title,
       artist: song.artist,
-      cover: `/getCover?file=${song.album}`,
+      cover: `/api/getCover?file=${song.album}`,
     });
     setIsPlaying(true);
   }

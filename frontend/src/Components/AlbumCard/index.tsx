@@ -20,7 +20,7 @@ const AlbumCard = ({
       }}
       onClick={onClick}
     >
-      {HandleFallbackImage(`/getCover?file=${album.id}`, "", null, {
+      {HandleFallbackImage(`/api/getCover?file=${album.id}`, "", null, {
         width: "100%",
         height: "max-content",
         borderRadius: "0.5rem",

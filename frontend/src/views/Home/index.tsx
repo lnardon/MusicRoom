@@ -15,8 +15,8 @@ const Home: React.FC = () => {
       id: track.id,
       title: track.title,
       artist: track.artist,
-      cover: `/getCover?file=${track.album}`,
-      file: `/getSong?file=${track.id}`,
+      cover: `/api/getCover?file=${track.album}`,
+      file: `/api/getSong?file=${track.id}`,
     });
     usePlayerStore.getState().setIsPlaying(true);
   }
@@ -34,7 +34,7 @@ const Home: React.FC = () => {
   }
 
   useEffect(() => {
-    fetch("/getHistory")
+    fetch("/api/getHistory")
       .then((res) => res.json())
       .then((data) => {
         setRecentlyPlayed(data.songs);
