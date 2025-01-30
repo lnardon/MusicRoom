@@ -48,9 +48,7 @@ func ScanHandler(w http.ResponseWriter, r *http.Request) {
 
 		streamer, format, err := mp3.Decode(f)
 		if err != nil {
-			fmt.Println("@#@#@#@#@#@#@#@#@#@#@#@#@#@#")
-			fmt.Println("Error decoding file: =====> ", file, err)
-			fmt.Println("@#@#@#@#@#@#@#@#@#@#@#@#@#@#")
+			fmt.Println("Error decoding file:", file, err)
 			error_decoding = append(error_decoding, file)
 			continue
 		}
@@ -115,16 +113,19 @@ func ScanHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	log.Println("\n\nUnable to open the files: ")
-	for idx, file := range unable_to_open {
-		fmt.Printf("%d - %s\n",idx, file)
+	if len(unable_to_open) > 0 {
+		log.Println("\n\nUnable to open the files: ")
+		for idx, file := range unable_to_open {
+			fmt.Printf("%d - %s\n", idx, file)
+		}
 	}
 
-	log.Println("\n\nThere was an error decoding the tag info from the files: ")
-	for idx, file := range error_decoding {
-		fmt.Printf("%d - %s\n",idx, file)
+	if len(error_decoding) > 0 {
+		log.Println("\n\nThere was an error decoding the tag info from the files: ")
+		for idx, file := range error_decoding {
+			fmt.Printf("%d - %s\n", idx, file)
+		}
 	}
 
 	w.Write([]byte("Done"))
 }
-

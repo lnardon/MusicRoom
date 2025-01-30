@@ -2,13 +2,14 @@ package utils
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
-	"log"
 
 	Types "server/types"
+
 	"github.com/bogem/id3v2"
 )
 
@@ -46,7 +47,6 @@ func GetAllFilesHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write(jsonResponse)
 }
 
-// This function updates the artists string in the MP3 files metadata to use a ; as separator instead of a /
 // Example: "Artist1/Artist2" -> "Artist1;Artist2"
 func UpdateArtistsString(path string) {
 	files, err := GetAllFilesInPath(path)
