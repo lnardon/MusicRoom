@@ -3,13 +3,14 @@ import { useEffect, useState } from "react";
 import AnimatedText from "animated-text-letters";
 import { useUrlStore } from "../../stores/urlStore";
 import { usePlayerStore } from "../../stores/playerStore";
-import { HandleFallbackImage } from "../../utils/helpers";
-import OptionsMenu from "../../Components/OptionsMenu";
+import { apiHandler } from "../../utils/apiHandler";
+import AlbumCard from "../../Components/AlbumCard";
+import SongTableCell from "../../Components/SongTableCell";
 import styles from "./styles.module.css";
 
 const ArtistProfile: React.FC = () => {
   const setUrl = useUrlStore((state) => state.setUrl);
-  const { setSong, song, setIsPlaying } = usePlayerStore();
+  const { setSong, setIsPlaying } = usePlayerStore();
 
   const artist = new URLSearchParams(window.location.search).get("artist");
   const [info, setInfo] = useState({
@@ -32,7 +33,7 @@ const ArtistProfile: React.FC = () => {
 
   useEffect(() => {
     document.title = info.name || "Artist Profile";
-    fetch(`/api/getArtist?artist=${artist}`).then((res) => {
+    apiHandler(`/api/getArtist?artist=${artist}`, "GET").then((res) => {
       res.json().then((data) => {
         setInfo(data);
       });
@@ -57,70 +58,26 @@ const ArtistProfile: React.FC = () => {
       <div className={styles.songs}>
         <div>
           <h3>Tracks</h3>
-          <button
-          >All songs</button>
+          <button>All songs</button>
         </div>
-        {info.songs.map((song1: any, index: any) => (
-          <div
-            className={styles.song}
-            key={index}
-            style={{
-              animationDelay: `${index * 0.08}s`,
-              background:
-                index % 2 === 0 ? "rgba(0, 0, 0, 0.32)" : "rgba(0, 0, 0, 0.08)",
-              color: song.id === song1.id ? "#ffd000" : "white",
-              fontWeight: song.id === song1.id ? "bold" : "normal",
-            }}
-            onClick={() => {
-              setSong({
-                id: song1.id,
-                title: song1.title,
-                artist: {
-                  id: artist || "",
-                  name: info.name,
-                },
-                cover: `/api/getCover?file=${
-                  (
-                    info.albums.filter(
-                      (album: any) => album.title === song1.album
-                    )[0] as { id: string }
-                  ).id
-                }`,
-                file: `/api/getSong?file=${song1.id}`,
-              });
-              setIsPlaying(true);
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-              }}
-            >
-              {HandleFallbackImage(
-                `/api/getCover?file=${
-                  (
-                    info.albums.filter(
-                      (album: any) => album.title === song1.album
-                    )[0] as { id: string }
-                  ).id
-                }`,
-                styles.songCover
-              )}
-              <h4 className={styles.title}>{song1.title}</h4>
-            </div>
-            <h4 className={styles.duration}>{song1.duration}</h4>
-            <div
-              style={{
-                width: "2rem",
-                position: "absolute",
-                right: "0.25rem",
-              }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <OptionsMenu trackId={song1.id} />
-            </div>
-          </div>
+        {info.songs.map((song: any, index: any) => (
+          <SongTableCell
+           index={index}
+           track={song}
+           handleClick={() => {
+            setSong({
+              id: song.id,
+              title: song.title,
+              artist: {
+                id: artist || "",
+                name: info.name,
+              },
+              cover: `/api/getCover?file=${song.album.id}`,
+              file: `/api/getSong?file=${song.id}`,
+            });
+            setIsPlaying(true);
+          }}
+          />
         ))}
       </div>
 
@@ -128,22 +85,13 @@ const ArtistProfile: React.FC = () => {
         <h3>Albums</h3>
         <div className={styles.albumsContainer}>
           {info.albums.map((album: any, index: any) => (
-            <div
-              className={styles.album}
-              key={index}
-              style={{
-                animationDelay: `${index * 0.08}s`,
-              }}
+            <AlbumCard
+              album={album}
+              index={index}
               onClick={() => {
                 handleClick(album.id);
               }}
-            >
-              {HandleFallbackImage(
-                `/api/getCover?file=${encodeURI(album.id)}`,
-                styles.cover
-              )}
-              <h4>{album.title}</h4>
-            </div>
+            />
           ))}
         </div>
       </div>

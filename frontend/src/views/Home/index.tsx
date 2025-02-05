@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import { usePlayerStore } from "../../stores/playerStore";
 import { useUrlStore } from "../../stores/urlStore";
-import styles from "./styles.module.css";
 import AlbumCard from "../../Components/AlbumCard";
 import SongTableCell from "../../Components/SongTableCell";
 import { Track, Album } from "../../types";
+import { apiHandler } from "../../utils/apiHandler";
+import styles from "./styles.module.css";
 
 const Home: React.FC = () => {
   const [recentlyPlayed, setRecentlyPlayed] = useState([]);
@@ -15,7 +16,7 @@ const Home: React.FC = () => {
       id: track.id,
       title: track.title,
       artist: track.artist,
-      cover: `/api/getCover?file=${track.album}`,
+      cover: `/api/getCover?file=${track.album.id}`,
       file: `/api/getSong?file=${track.id}`,
     });
     usePlayerStore.getState().setIsPlaying(true);
@@ -34,7 +35,7 @@ const Home: React.FC = () => {
   }
 
   useEffect(() => {
-    fetch("/api/getHistory")
+    apiHandler("/api/getHistory", "GET", "", {})
       .then((res) => res.json())
       .then((data) => {
         setRecentlyPlayed(data.songs);
@@ -42,7 +43,6 @@ const Home: React.FC = () => {
       })
       .catch((err) => {
         console.error(err);
-        alert("An error occurred");
       });
   }, []);
 

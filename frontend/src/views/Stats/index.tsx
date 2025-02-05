@@ -7,6 +7,7 @@ import styles from "./styles.module.css";
 import AnimatedText from "animated-text-letters";
 import { PlayIcon } from "lucide-react";
 import { HandleFallbackImage } from "../../utils/helpers";
+import { apiHandler } from "../../utils/apiHandler";
 
 const Stats: React.FC = () => {
   const setUrl = useUrlStore((state) => state.setUrl);
@@ -14,7 +15,7 @@ const Stats: React.FC = () => {
   const [stats, setStats] = useState<any>({});
 
   useEffect(() => {
-    fetch(`/api/getStats`).then((res) => {
+    apiHandler("/api/getStats", "GET").then((res) => {
       res.json().then((data) => {
         setStats(data);
       });

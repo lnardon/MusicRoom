@@ -5,6 +5,7 @@ import { usePlayerStore } from "../../stores/playerStore";
 import AlbumCard from "../../Components/AlbumCard";
 import { Album, Artist, Track } from "../../types";
 import SongTableCell from "../../Components/SongTableCell";
+import { apiHandler } from "../../utils/apiHandler";
 
 const Home = () => {
   const [songs, setSongs] = useState([]);
@@ -22,7 +23,7 @@ const Home = () => {
   useEffect(() => {
     setLoading(true);
     if (view === "artists") {
-      fetch("/api/getAllArtists")
+      apiHandler("/api/getAllArtists", "GET")
         .then((res) => res.json())
         .then((data) => {
           setArtists(data);
@@ -33,7 +34,7 @@ const Home = () => {
     }
 
     if (view === "songs") {
-      fetch("/api/getAllSongs")
+      apiHandler("/api/getAllSongs","GET")
         .then((res) => res.json())
         .then((data) => {
           setSongs(data);
@@ -44,7 +45,7 @@ const Home = () => {
     }
 
     if (view === "albums") {
-      fetch("/api/getAllAlbums")
+      apiHandler("/api/getAllAlbums","GET")
         .then((res) => res.json())
         .then((data) => {
           setAlbums(data);

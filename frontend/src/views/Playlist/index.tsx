@@ -5,6 +5,7 @@ import AnimatedText from "animated-text-letters";
 import { usePlayerStore } from "../../stores/playerStore";
 import { Pen, Shuffle } from "lucide-react";
 import SongTableCell from "../../Components/SongTableCell";
+import { apiHandler } from "../../utils/apiHandler";
 
 interface PlaylistInterface {
   id: string;
@@ -75,24 +76,18 @@ const Playlist: React.FC = () => {
   }
 
   function handleSaveEdit() {
-    fetch("/api/editPlaylist", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
+    apiHandler("/api/editPlaylist", "POST", "application/json", {
         id: playlist.id,
         name,
         cover,
         description,
-      }),
     }).then((res) => {
       if (res.status === 200) {
         setIsModalOpen(false);
-        fetch(
+        apiHandler(
           `/api/getPlaylist?id=${
             new URLSearchParams(window.location.search).get("playlist") || ""
-          }`
+          }`, "GET"
         )
           .then((response) => response.json())
           .then((data) => {
@@ -103,10 +98,10 @@ const Playlist: React.FC = () => {
   }
 
   useEffect(() => {
-    fetch(
+    apiHandler(
       `/api/getPlaylist?id=${
         new URLSearchParams(window.location.search).get("playlist") || ""
-      }`
+      }`, "GET"
     )
       .then((response) => response.json())
       .then((data) => {

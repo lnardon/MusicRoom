@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import ReactDOM from "react-dom";
 import styles from "./styles.module.css";
 import { Ellipsis } from "lucide-react";
+import { apiHandler } from "../../utils/apiHandler";
 
 const OptionsMenu = ({ trackId }: { trackId: string }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -11,7 +12,7 @@ const OptionsMenu = ({ trackId }: { trackId: string }) => {
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   function fetchPlaylists() {
-    fetch("/api/getAllPlaylists")
+    apiHandler("/api/getAllPlaylists", "GET")
       .then((res) => res.json())
       .then((data) => {
         setPlaylists(data);
@@ -19,15 +20,9 @@ const OptionsMenu = ({ trackId }: { trackId: string }) => {
   }
 
   function handleAddToPlaylist(playlist_id: string) {
-    fetch("/api/addSongToPlaylist", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
+    apiHandler("/api/addSongToPlaylist", "POST", "application/json", {
         playlist_id,
         song_id: trackId,
-      }),
     }).then((res) => {
       if (res.status === 200) {
         alert("Song added to Black Crow!");

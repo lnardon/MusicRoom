@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import styles from "./styles.module.css";
 import AnimatedText from "animated-text-letters";
 import { useUrlStore } from "../../stores/urlStore";
+import { apiHandler } from "../../utils/apiHandler";
 
 const Playlists = () => {
   const [playlists, setPlaylists] = useState<
@@ -20,15 +21,9 @@ const Playlists = () => {
   const [playlistCover, setPlaylistCover] = useState("");
 
   function createPlaylist() {
-    fetch("/api/createPlaylist", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
+    apiHandler("/api/createPlaylist", "POST", "application/json", {
         name: playlistName,
         cover: playlistCover,
-      }),
     }).then((res) => {
       setIsModalOpen(false);
       setPlaylistName("");
@@ -53,7 +48,7 @@ const Playlists = () => {
   }
 
   useEffect(() => {
-    fetch("/api/getAllPlaylists")
+    apiHandler("/api/getAllPlaylists","GET")
       .then((res) => res.json())
       .then((data) => {
         setPlaylists(data);
