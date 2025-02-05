@@ -15,7 +15,7 @@ export function HandleFallbackImage(
       style={styles}
     >
       <img
-        src="https://static.vecteezy.com/system/resources/previews/009/393/830/original/black-vinyl-disc-record-for-music-album-cover-design-free-png.png"
+        src="/assets/vinyl_placeholder.webp"
         alt="cover image"
         style={{
           width: "100%",

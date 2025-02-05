@@ -116,7 +116,7 @@ const Playlist: React.FC = () => {
     <div className={styles.container}>
       <div className={styles.header}>
         <img
-          src={playlist?.cover || "https://via.placeholder.com/150"}
+          src={playlist?.cover || "/assets/vinyl_placeholder.webp"}
           alt="Cover"
           className={styles.cover}
         />

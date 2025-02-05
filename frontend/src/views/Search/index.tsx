@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
+import { useInView } from "react-intersection-observer";
 import { useUrlStore } from "../../stores/urlStore";
-import styles from "./styles.module.css";
 import { usePlayerStore } from "../../stores/playerStore";
 import AlbumCard from "../../Components/AlbumCard";
 import { Album, Artist, Track } from "../../types";
 import SongTableCell from "../../Components/SongTableCell";
 import { apiHandler } from "../../utils/apiHandler";
+import styles from "./styles.module.css";
 
 const Home = () => {
   const [songs, setSongs] = useState([]);
@@ -19,6 +20,9 @@ const Home = () => {
   const [search, setSearch] = useState("");
 
   const { setSong, setIsPlaying } = usePlayerStore();
+  const { ref } = useInView({
+    threshold: 0,
+  });
 
   useEffect(() => {
     setLoading(true);
@@ -165,7 +169,7 @@ const Home = () => {
                   onClick={() => handleOpenArtistProfile(artist)}
                 >
                   <img
-                    src="https://st3.depositphotos.com/9998432/13335/v/450/depositphotos_133351928-stock-illustration-default-placeholder-man-and-woman.jpg"
+                    src="/assets/avatar_placeholder.jpg"
                     alt=""
                     className={styles.avatar}
                   />
@@ -176,7 +180,7 @@ const Home = () => {
           )}
 
           {view === "albums" && (
-            <div className={styles.albumsContainer}>
+            <div ref={ref} className={styles.albumsContainer}>
               {filteredAlbums.map((album: Album, index: number) => (
                 <AlbumCard
                   index={index}
@@ -191,13 +195,18 @@ const Home = () => {
           )}
 
           {view === "songs" &&
-            filteredSongs.map((song: Track, index: number) => (
-              <SongTableCell
-                index={index}
-                track={song}
-                handleClick={() => handleGetSong(song)}
-              />
-            ))}
+            <div ref={ref}>
+              {            
+                filteredSongs.map((song: Track, index: number) => (
+                  <SongTableCell
+                    index={index}
+                    track={song}
+                    handleClick={() => handleGetSong(song)}
+                  />
+                ))
+              }
+            </div>
+          }
         </>
       )}
     </div>
