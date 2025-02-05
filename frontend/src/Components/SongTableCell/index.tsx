@@ -1,6 +1,6 @@
 import { Track } from "../../types";
 import { HandleFallbackImage } from "../../utils/helpers";
-import OptionsMenu from "../OptionsMenu";
+// import OptionsMenu from "../OptionsMenu";
 import { usePlayerStore } from "../../stores/playerStore"
 import styles from "./styles.module.css";
 import { useUrlStore } from "../../stores/urlStore";
@@ -9,10 +9,12 @@ const SongTableCell = ({
   track,
   index,
   handleClick,
+  hideCover = false
 }: {
   track: Track;
   index: number;
   handleClick: (track: Track) => void;
+  hideCover?: boolean
 }) => {
   const song = usePlayerStore(state => state.song);
   const setUrl = useUrlStore((state) => state.setUrl);
@@ -40,22 +42,28 @@ const SongTableCell = ({
       onClick={() => handleClick(track)}
       onContextMenu={() => { }}
     >
-      {HandleFallbackImage(`/api/getCover?file=${track.album}`, "", null, {
-        width: "2.5rem",
-        height: "2.5rem",
-        borderRadius: "0.25rem",
-        marginRight: "0.5rem",
-      })}
-      <div className={styles.textContainer}>
-        <p className={styles.title}>{track.title}</p>
-        <p className={styles.artist} onClick={ e => {
-          e.preventDefault();
-          e.stopPropagation();
-          handleArtistClick(track.artist.id)
-        }}>{track.artist.name}</p>
+      <div style={{
+        display: "flex",
+        flexDirection: "row"
+      }}>
+        {hideCover ? null : HandleFallbackImage(`/api/getCover?file=${track.album.id}`, "", null, {
+          width: "2.5rem",
+          height: "2.5rem",
+          borderRadius: "0.25rem",
+          marginRight: "0.5rem",
+        })}
+        <div className={styles.textContainer}>
+          <p className={styles.title}>{track.title}</p>
+          <p className={styles.artist} onClick={ e => {
+            e.preventDefault();
+            e.stopPropagation();
+            handleArtistClick(track.artist.id)
+          }}>{track.artist.name}</p>
+        </div>
       </div>
       <div onClick={(e) => e.stopPropagation()}>
-        <OptionsMenu trackId={track.id} />
+        <p className={styles.duration}>{track.duration}</p>
+        {/* <OptionsMenu trackId={track.id} /> */}
       </div>
     </div>
   );

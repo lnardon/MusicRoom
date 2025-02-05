@@ -23,7 +23,7 @@ const AlbumCard = ({
       {HandleFallbackImage(`/api/getCover?file=${album.id}`, "", null, {
         width: "100%",
         height: "max-content",
-        borderRadius: "0.5rem",
+        borderRadius: "0.25rem",
         marginBottom: "0.5rem",
       })}
       <p className={styles.title}>{album.title}</p>
