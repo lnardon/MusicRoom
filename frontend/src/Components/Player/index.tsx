@@ -9,12 +9,12 @@ import {
   SkipBack,
   // MicVocal,
 } from "lucide-react";
-import { usePlayerStore } from "../../stores/playerStore";
-import { useUrlStore } from "../../stores/urlStore";
-import { useAudioAnalyser } from "./analyser";
 import "animated-text-letters/index.css";
-import styles from "./styles.module.css";
+import { usePlayerStore } from "../../stores/playerStore";
+import { useAudioAnalyser } from "./analyser";
 import { HandleFallbackImage } from "../../utils/helpers";
+import {useHandleOpenArtist} from "../../utils/hooks"
+import styles from "./styles.module.css";
 
 const Player: React.FC = () => {
   const {
@@ -32,10 +32,11 @@ const Player: React.FC = () => {
     setFreq1,
     setFreq2,
   } = usePlayerStore();
-  const setUrl = useUrlStore((state) => state.setUrl);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const analyser = useAudioAnalyser(audioRef, isPlaying);
   const [progress, setProgress] = useState<number>(0);
+
+  const handleOpenArtist = useHandleOpenArtist()
 
   const handlePlayPause = (): void => {
     const audio = audioRef.current;
@@ -114,18 +115,6 @@ const Player: React.FC = () => {
     return `${minutes}:${paddedSeconds}`;
   }
 
-  function handleClick(artist: string) {
-    const searchParams = new URLSearchParams(window.location.search);
-    searchParams.set("artist", artist);
-    searchParams.set("view", "artist_profile");
-    window.history.pushState(
-      {},
-      "",
-      `${window.location.pathname}?${searchParams.toString()}`
-    );
-    setUrl(window.location.search);
-  }
-
   return (
     <div className={styles.container}>
       <div className={styles.trackInfo}>
@@ -148,7 +137,7 @@ const Player: React.FC = () => {
           </span>
           <span
             className={styles.artist}
-            onClick={() => handleClick(artist.id)}
+            onClick={() => handleOpenArtist(artist)}
           >
             <AnimatedText
               text={artist.name}

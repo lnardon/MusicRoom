@@ -1,18 +1,18 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect } from "react";
-import { useUrlStore } from "../../stores/urlStore";
-import { usePlayerStore } from "../../stores/playerStore";
-
-import styles from "./styles.module.css";
 import AnimatedText from "animated-text-letters";
 import { PlayIcon } from "lucide-react";
 import { HandleFallbackImage } from "../../utils/helpers";
 import { apiHandler } from "../../utils/apiHandler";
+import { useHandleOpenArtist, useHandlePlaySong, useHandleOpenAlbum } from "../../utils/hooks";
+import styles from "./styles.module.css";
 
 const Stats: React.FC = () => {
-  const setUrl = useUrlStore((state) => state.setUrl);
-  const { setSong, setIsPlaying } = usePlayerStore();
   const [stats, setStats] = useState<any>({});
+
+  const handleOpenArtist = useHandleOpenArtist();
+  const handlePlaySong = useHandlePlaySong();
+  const handleOpenAlbum = useHandleOpenAlbum();
 
   useEffect(() => {
     apiHandler("/api/getStats", "GET").then((res) => {
@@ -59,19 +59,7 @@ const Stats: React.FC = () => {
                       cursor: "pointer",
                       animationDelay: `${index * 0.08}s`,
                     }}
-                    onClick={() => {
-                      const searchParams = new URLSearchParams(
-                        window.location.search
-                      );
-                      searchParams.set("artist", artist.id || "");
-                      searchParams.set("view", "artist_profile");
-                      window.history.pushState(
-                        {},
-                        "",
-                        `${window.location.pathname}?${searchParams.toString()}`
-                      );
-                      setUrl(window.location.search);
-                    }}
+                    onClick={() => {handleOpenArtist(artist)}}
                   >
                     <p
                       style={{
@@ -99,19 +87,7 @@ const Stats: React.FC = () => {
                       cursor: "pointer",
                       animationDelay: `${index * 0.04}s`,
                     }}
-                    onClick={() => {
-                      const searchParams = new URLSearchParams(
-                        window.location.search
-                      );
-                      searchParams.set("album", album.id || "");
-                      searchParams.set("view", "album");
-                      window.history.pushState(
-                        {},
-                        "",
-                        `${window.location.pathname}?${searchParams.toString()}`
-                      );
-                      setUrl(window.location.search);
-                    }}
+                    onClick={() => {handleOpenAlbum(album)}}
                   >
                     {HandleFallbackImage(
                       `/api/getCover?file=${album.id}`,
@@ -147,15 +123,7 @@ const Stats: React.FC = () => {
                   style={{
                     animationDelay: `${index * 64}ms`,
                   }}
-                  onClick={() => {
-                    setSong({
-                      title: song.title,
-                      artist: song.artist,
-                      cover: `/api/getCover?file=${song.album.id}`,
-                      file: `/api/getSong?file=${song.id}`,
-                    });
-                    setIsPlaying(true);
-                  }}
+                  onClick={() => {handlePlaySong(song)}}
                 >
                   <div
                     style={{

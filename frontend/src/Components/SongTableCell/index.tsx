@@ -1,9 +1,9 @@
 import { Track } from "../../types";
 import { HandleFallbackImage } from "../../utils/helpers";
+import { useHandleOpenArtist } from "../../utils/hooks";
 // import OptionsMenu from "../OptionsMenu";
 import { usePlayerStore } from "../../stores/playerStore"
 import styles from "./styles.module.css";
-import { useUrlStore } from "../../stores/urlStore";
 
 const SongTableCell = ({
   track,
@@ -17,19 +17,8 @@ const SongTableCell = ({
   hideCover?: boolean
 }) => {
   const song = usePlayerStore(state => state.song);
-  const setUrl = useUrlStore((state) => state.setUrl);
 
-  function handleArtistClick(artist: string) {
-    const searchParams = new URLSearchParams(window.location.search);
-    searchParams.set("artist", artist);
-    searchParams.set("view", "artist_profile");
-    window.history.pushState(
-      {},
-      "",
-      `${window.location.pathname}?${searchParams.toString()}`
-    );
-    setUrl(window.location.search);
-  }
+  const handleOpenArtist = useHandleOpenArtist()
 
   return (
     <div
@@ -57,7 +46,7 @@ const SongTableCell = ({
           <p className={styles.artist} onClick={ e => {
             e.preventDefault();
             e.stopPropagation();
-            handleArtistClick(track.artist.id)
+            handleOpenArtist(track.artist)
           }}>{track.artist.name}</p>
         </div>
       </div>

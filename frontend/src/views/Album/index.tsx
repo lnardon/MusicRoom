@@ -1,11 +1,11 @@
 import { useState, useEffect, useRef } from "react";
 import AnimatedText from "animated-text-letters";
 import { usePlayerStore } from "../../stores/playerStore";
-import { useUrlStore } from "../../stores/urlStore";
 import { Track } from "../../types";
 import { HandleFallbackImage } from "../../utils/helpers";
 import { apiHandler } from "../../utils/apiHandler";
 import SongTableCell from "../../Components/SongTableCell";
+import { useHandleOpenArtist } from "../../utils/hooks";
 import styles from "./styles.module.css";
 
 const Album: React.FC = () => {
@@ -14,9 +14,10 @@ const Album: React.FC = () => {
   const [cover, setCover] = useState("");
   const [tracks, setTracks] = useState<Track[]>([]);
 
+  const handleOpenArtist = useHandleOpenArtist()
+
   const { setSong, setIsPlaying, setQueue, isShuffled, freq1, freq2 } =
     usePlayerStore();
-  const setUrl = useUrlStore((state) => state.setUrl);
   const coverRef = useRef<HTMLImageElement>(null);
   const albumId = new URLSearchParams(window.location.search).get("album") || "";
   const lerp = (a: number, b: number, t: number) => a + t * (b - a);
@@ -102,19 +103,7 @@ const Album: React.FC = () => {
             <span className={styles.artistNameDetail}>by</span>
             <span
               className={styles.artistName}
-              onClick={() => {
-                const searchParams = new URLSearchParams(
-                  window.location.search
-                );
-                searchParams.set("artist", artist.id);
-                searchParams.set("view", "artist_profile");
-                window.history.pushState(
-                  {},
-                  "",
-                  `${window.location.pathname}?${searchParams.toString()}`
-                );
-                setUrl(window.location.search);
-              }}
+              onClick={() => handleOpenArtist(artist)}
             >
               {artist.name}
             </span>

@@ -1,11 +1,10 @@
 import { useEffect, useState } from "react";
 import { useInView } from "react-intersection-observer";
-import { useUrlStore } from "../../stores/urlStore";
-import { usePlayerStore } from "../../stores/playerStore";
 import AlbumCard from "../../Components/AlbumCard";
 import { Album, Artist, Track } from "../../types";
 import SongTableCell from "../../Components/SongTableCell";
 import { apiHandler } from "../../utils/apiHandler";
+import { useHandlePlaySong, useHandleOpenArtist, useHandleOpenAlbum } from "../../utils/hooks"
 import styles from "./styles.module.css";
 
 const Home = () => {
@@ -19,7 +18,10 @@ const Home = () => {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
 
-  const { setSong, setIsPlaying } = usePlayerStore();
+  const handleOpenArtist = useHandleOpenArtist();
+  const handlePlaySong = useHandlePlaySong();
+  const handleOpenAlbum = useHandleOpenAlbum();
+
   const { ref } = useInView({
     threshold: 0,
   });
@@ -79,40 +81,6 @@ const Home = () => {
     );
   }, [albums, artists, search, songs]);
 
-  function handleGetSong(song: Track) {
-    setSong({
-      file: `/api/getSong?file=${song.id}`,
-      title: song.title,
-      artist: song.artist,
-      cover: `/api/getCover?file=${song.album}`,
-    });
-    setIsPlaying(true);
-  }
-
-  function handleOpenArtistProfile(artist: Artist) {
-    const searchParams = new URLSearchParams();
-    searchParams.set("artist", artist.id);
-    searchParams.set("view", "artist_profile");
-    window.history.pushState(
-      {},
-      "",
-      `${window.location.pathname}?${searchParams.toString()}`
-    );
-    useUrlStore.getState().setUrl(window.location.search);
-  }
-
-  function handleOpenAlbum(album: Album) {
-    const searchParams = new URLSearchParams(window.location.search);
-    searchParams.set("album", album.id);
-    searchParams.set("view", "album");
-    window.history.pushState(
-      {},
-      "",
-      `${window.location.pathname}?${searchParams.toString()}`
-    );
-    useUrlStore.getState().setUrl(window.location.search);
-  }
-
   return (
     <div className={styles.container}>
       <input
@@ -166,7 +134,7 @@ const Home = () => {
                 <div
                   className={styles.artist}
                   key={index}
-                  onClick={() => handleOpenArtistProfile(artist)}
+                  onClick={() => handleOpenArtist(artist)}
                 >
                   <img
                     src="/assets/avatar_placeholder.jpg"
@@ -201,7 +169,7 @@ const Home = () => {
                   <SongTableCell
                     index={index}
                     track={song}
-                    handleClick={() => handleGetSong(song)}
+                    handleClick={() => handlePlaySong(song)}
                   />
                 ))
               }
