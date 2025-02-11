@@ -1,69 +1,61 @@
 package artist
 
 import (
-	"database/sql"
 	"encoding/json"
 	"net/http"
 	"strings"
 
+	_ "github.com/lib/pq"
+
+	Database "server/modules/database"
 	Types "server/types"
 )
 
 func GetAllArtistsHandler(w http.ResponseWriter, r *http.Request) {
-    db, err := sql.Open("sqlite3", "./db/database.db")
-    if err != nil {
-        http.Error(w, "Failed to open database", http.StatusInternalServerError)
-        return
-    }
-    defer db.Close()
+	db := Database.GetDB()
 
-    rows, err := db.Query("SELECT id, name FROM Artists")
-    if err != nil {
-        http.Error(w, "Failed to query database", http.StatusInternalServerError)
-        return
-    }
-    defer rows.Close()
+	rows, err := db.Query("SELECT id, name FROM Artists")
+	if err != nil {
+		http.Error(w, "Failed to query database", http.StatusInternalServerError)
+		return
+	}
+	defer rows.Close()
 
-    var artists []Types.SimpleArtistInfo
-    for rows.Next() {
-        var artist Types.SimpleArtistInfo
-        if err := rows.Scan(&artist.ID, &artist.Name); err != nil {
-            http.Error(w, "Failed to scan row", http.StatusInternalServerError)
-            return
-        }
-        artists = append(artists, artist)
-    }
+	var artists []Types.SimpleArtistInfo
+	for rows.Next() {
+		var artist Types.SimpleArtistInfo
+		if err := rows.Scan(&artist.ID, &artist.Name); err != nil {
+			http.Error(w, "Failed to scan row", http.StatusInternalServerError)
+			return
+		}
+		artists = append(artists, artist)
+	}
 
-    jsonResponse, err := json.Marshal(artists)
-    if err != nil {
-        http.Error(w, err.Error(), http.StatusInternalServerError)
-        return
-    }
+	jsonResponse, err := json.Marshal(artists)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
-    w.Header().Set("Content-Type", "application/json")
-    w.Write(jsonResponse)
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(jsonResponse)
 }
 
 func GetArtistHandler(w http.ResponseWriter, r *http.Request) {
 	artistID := r.URL.Query().Get("artist")
 
-	db, err := sql.Open("sqlite3", "./db/database.db")
+	db := Database.GetDB()
+
+	artistName := ""
+	err := db.QueryRow("SELECT name FROM Artists WHERE id = $1", artistID).Scan(&artistName)
 	if err != nil {
-		http.Error(w, "Failed to open database", http.StatusInternalServerError)
+		http.Error(w, "Failed to query artist", http.StatusInternalServerError)
 		return
 	}
-	defer db.Close()
-
-    artistName := ""
-    err = db.QueryRow("SELECT name FROM Artists WHERE id = ?", artistID).Scan(&artistName)
-    if err != nil {
-        http.Error(w, "Failed to query artist", http.StatusInternalServerError)
-        return
-    }
 
 	var artistInfo Types.ArtistInfo
 	artistInfo.Name = artistName
-	albumsRows, err := db.Query("SELECT id, title FROM Albums WHERE artist = ?", artistID)
+	albumsRows, err := db.Query("SELECT id, title FROM Albums WHERE artist = $1", artistID)
 	if err != nil {
 		http.Error(w, "Failed to query albums", http.StatusInternalServerError)
 		return
@@ -84,13 +76,13 @@ func GetArtistHandler(w http.ResponseWriter, r *http.Request) {
 	if len(albumIDs) > 0 {
 		placeholders := make([]string, len(albumIDs))
 		for i := range placeholders {
-			placeholders[i] = "?"
+			placeholders[i] = "$" + string(rune(i+1))
 		}
 		placeholdersStr := strings.Join(placeholders, ",")
-		query := `SELECT s.id, s.title, s.duration, s.track_number, a.id, a.name, al.title FROM Songs s 
-				  JOIN Albums al ON s.album = al.id
-				  JOIN Artists a ON al.artist = a.id
-				  WHERE al.id IN (` + placeholdersStr + `) ORDER BY RANDOM() LIMIT 5`
+		query := `SELECT s.id, s.title, s.duration, s.track_number, a.id, a.name, al.id, al.title FROM Songs s 
+			  JOIN Albums al ON s.album = al.id
+			  JOIN Artists a ON al.artist = a.id
+			  WHERE al.id IN (` + placeholdersStr + `) ORDER BY RANDOM() LIMIT 5`
 
 		args := make([]interface{}, len(albumIDs))
 		for i, id := range albumIDs {
@@ -106,7 +98,7 @@ func GetArtistHandler(w http.ResponseWriter, r *http.Request) {
 
 		for songsRows.Next() {
 			var song Types.Song
-			if err := songsRows.Scan(&song.ID, &song.Title, &song.Duration, &song.TrackNumber, &song.Artist.ID, &song.Artist.Name, &song.Album); err != nil {
+			if err := songsRows.Scan(&song.ID, &song.Title, &song.Duration, &song.TrackNumber, &song.Artist.ID, &song.Artist.Name, &song.Album.ID, &song.Album.Name); err != nil {
 				http.Error(w, "Error scanning songs", http.StatusInternalServerError)
 				return
 			}

@@ -1,12 +1,13 @@
 package auth
 
 import (
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
 	"time"
+
+	Database "server/modules/database"
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
@@ -35,23 +36,12 @@ func HandleLogin(w http.ResponseWriter, r *http.Request) {
 	}
 	defer r.Body.Close()
 
-	db, err := sql.Open("sqlite3", "./db/database.db")
-	if err != nil {
-		http.Error(w, "Failed to open database", http.StatusInternalServerError)
-		return
-	}
-	defer db.Close()
-
-	statement, err := db.Prepare("SELECT id, password FROM Users WHERE username = ?")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer statement.Close()
+	db := Database.GetDB()
 
 	var hashedPassword, id string
-	err = statement.QueryRow(login.Username).Scan(&id, &hashedPassword)
+	err = db.QueryRow("SELECT id, password FROM Users WHERE username = $1", login.Username).Scan(&id, &hashedPassword)
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if err.Error() == "sql: no rows in result set" {
 			http.Error(w, "Invalid username or password", http.StatusUnauthorized)
 		} else {
 			log.Fatal(err)
@@ -71,7 +61,6 @@ func HandleLogin(w http.ResponseWriter, r *http.Request) {
 			ExpiresAt: jwt.NewNumericDate(expirationTime),
 		},
 	}
-
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	tokenString, err := token.SignedString(jwtKey)
 	if err != nil {
@@ -92,18 +81,7 @@ func HandleSignUp(w http.ResponseWriter, r *http.Request) {
 	}
 	defer r.Body.Close()
 
-	db, err := sql.Open("sqlite3", "./db/database.db")
-	if err != nil {
-		http.Error(w, "Failed to open database", http.StatusInternalServerError)
-		return
-	}
-	defer db.Close()
-
-	statement, err := db.Prepare("INSERT INTO Users (id, username, password, created_at) VALUES (?, ?, ?, ?)")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer statement.Close()
+	db := Database.GetDB()
 
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(register.Password), 16)
 	if err != nil {
@@ -112,7 +90,7 @@ func HandleSignUp(w http.ResponseWriter, r *http.Request) {
 	}
 
 	id := uuid.New().String()
-	_, err = statement.Exec(id, register.Username, string(hashedPassword), time.Now())
+	_, err = db.Exec("INSERT INTO Users (id, username, password, created_at) VALUES ($1, $2, $3, $4)", id, register.Username, string(hashedPassword), time.Now())
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -125,7 +103,6 @@ func HandleSignUp(w http.ResponseWriter, r *http.Request) {
 			ExpiresAt: jwt.NewNumericDate(expirationTime),
 		},
 	}
-
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	tokenString, err := token.SignedString(jwtKey)
 	if err != nil {
@@ -161,4 +138,7 @@ func VerifyJWT(endpointHandler http.HandlerFunc) http.HandlerFunc {
 			http.Error(w, "Unauthorized: No Token in Request", http.StatusUnauthorized)
 		}
 	}
+}
+
+func HandleCheckToken(w http.ResponseWriter, r *http.Request) {
 }
