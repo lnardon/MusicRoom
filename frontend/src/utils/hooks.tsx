@@ -1,6 +1,8 @@
+import { useState } from "react";
 import { usePlayerStore } from "../stores/playerStore";
 import { useUrlStore } from "../stores/urlStore";
 import { Album, Artist, Track } from "../types";
+import { apiHandler } from "./apiHandler";
 
 export function urlHistoryHandler(
   key: string,
@@ -19,16 +21,40 @@ export function urlHistoryHandler(
   
 export function useHandlePlaySong() {
   const { setSong, setIsPlaying } = usePlayerStore();
+  const [blobUrlMap, setBlobUrlMap] = useState<Map<string, string>>(new Map());
 
-  return (song: Track) => {
-    setSong({
-      id: song.id,
-      title: song.title,
-      artist: song.artist,
-      file: `/api/getSong?file=${song.id}`,
-      cover: `/api/getCover?file=${song.album.id}`,
-    });
-    setIsPlaying(true);
+  return async (song: Track) => {
+    if (blobUrlMap.has(song.id)) {
+      setSong({
+        id: song.id,
+        title: song.title,
+        artist: song.artist,
+        file: blobUrlMap.get(song.id) || "",
+        cover: `/api/getCover?file=${song.album.id}`,
+      });
+      setIsPlaying(true);
+      return;
+    }
+
+    try {
+      const response = await apiHandler(`/api/getSong?file=${song.id}`, "GET")
+      if (!response.ok) throw new Error("Failed to fetch song");
+
+      const blob = await response.blob();
+      const songUrl = URL.createObjectURL(blob);
+      setBlobUrlMap((prev) => new Map(prev).set(song.id, songUrl));
+      setSong({
+        id: song.id,
+        title: song.title,
+        artist: song.artist,
+        file: songUrl,
+        cover: `/api/getCover?file=${song.album.id}`,
+      });
+      setIsPlaying(true);
+      
+    } catch (error) {
+      console.error("Error loading song:", error);
+    }
   };
 }
   
