@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	Database "server/modules/database"
+	Types "server/types"
 
 	"github.com/google/uuid"
 )
@@ -118,8 +119,8 @@ func GetPlaylistHandler(w http.ResponseWriter, r *http.Request) {
 	playlist.ID = id
 
 	rows, err := db.Query(`
-		SELECT s.id, s.title, s.duration, s.track_number, s.release_date, s.path, s.lyrics, s.album,
-			a.title, a.cover, ar.id, ar.name, ar.avatar
+		SELECT s.id, s.title, s.duration, s.track_number, s.path, s.album,
+			a.title, ar.id, ar.name
 		FROM Songs s
 		INNER JOIN PlaylistSongs ps ON s.id = ps.song_id
 		INNER JOIN Albums a ON s.album = a.id
@@ -131,11 +132,11 @@ func GetPlaylistHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	defer rows.Close()
 
-	var songs []Song
+	var songs []Types.Song
 	for rows.Next() {
-		var song Song
-		err = rows.Scan(&song.ID, &song.Title, &song.Duration, &song.TrackNumber, &song.ReleaseDate, &song.Path, &song.Lyrics, &song.AlbumID,
-			&song.AlbumTitle, &song.AlbumCover, &song.ArtistID, &song.ArtistName, &song.ArtistAvatar)
+		var song Types.Song
+		err = rows.Scan(&song.ID, &song.Title, &song.Duration, &song.TrackNumber, &song.Path, &song.Album.ID,
+			&song.Artist.Name, &song.Artist.ID, &song.Artist.Name)
 		if err != nil {
 			http.Error(w, "Error reading song data", http.StatusInternalServerError)
 			return
