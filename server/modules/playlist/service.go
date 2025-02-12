@@ -1,21 +1,17 @@
 package playlist
 
 import (
-	"database/sql"
 	"encoding/json"
 	"log"
 	"net/http"
+
+	Database "server/modules/database"
 
 	"github.com/google/uuid"
 )
 
 func GetAllPlaylistsHandler(w http.ResponseWriter, r *http.Request) {
-	db, err := sql.Open("sqlite3", "./db/database.db")
-	if err != nil {
-		http.Error(w, "Failed to open database", http.StatusInternalServerError)
-		return
-	}
-	defer db.Close()
+	db := Database.GetDB()
 
 	rows, err := db.Query("SELECT id, name, cover FROM Playlists")
 	if err != nil {
@@ -39,26 +35,20 @@ func GetAllPlaylistsHandler(w http.ResponseWriter, r *http.Request) {
 
 	json.NewEncoder(w).Encode(playlists)
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
 }
 
 func CreatePlaylistHandler(w http.ResponseWriter, r *http.Request) {
-	db, err := sql.Open("sqlite3", "./db/database.db")
-	if err != nil {
-		http.Error(w, "Failed to open database", http.StatusInternalServerError)
-		return
-	}
-	defer db.Close()
+	db := Database.GetDB()
 
 	var playlist Playlist
-	err = json.NewDecoder(r.Body).Decode(&playlist)
+	err := json.NewDecoder(r.Body).Decode(&playlist)
 	if err != nil {
 		http.Error(w, "Failed to decode request", http.StatusBadRequest)
 		return
 	}
 
 	id := uuid.New().String()
-	_, err = db.Exec("INSERT INTO Playlists (id, name, cover) VALUES (?, ?, ?)", id, playlist.Name, playlist.Cover)
+	_, err = db.Exec("INSERT INTO Playlists (id, name, cover) VALUES ($1, $2, $3)", id, playlist.Name, playlist.Cover)
 	if err != nil {
 		http.Error(w, "Failed to insert playlist", http.StatusInternalServerError)
 		log.Println(err)
@@ -69,15 +59,10 @@ func CreatePlaylistHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func DeletePlaylistHandler(w http.ResponseWriter, r *http.Request) {
-	db, err := sql.Open("sqlite3", "./db/database.db")
-	if err != nil {
-		http.Error(w, "Failed to open database", http.StatusInternalServerError)
-		return
-	}
-	defer db.Close()
+	db := Database.GetDB()
 
 	id := r.URL.Query().Get("id")
-	_, err = db.Exec("DELETE FROM Playlists WHERE id = ?", id)
+	_, err := db.Exec("DELETE FROM Playlists WHERE id = $1", id)
 	if err != nil {
 		http.Error(w, "Failed to delete playlist", http.StatusInternalServerError)
 		return
@@ -87,15 +72,10 @@ func DeletePlaylistHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func AddSongToPlaylistHandler(w http.ResponseWriter, r *http.Request) {
-	db, err := sql.Open("sqlite3", "./db/database.db")
-	if err != nil {
-		http.Error(w, "Failed to open database", http.StatusInternalServerError)
-		return
-	}
-	defer db.Close()
+	db := Database.GetDB()
 
 	var data map[string]string
-	err = json.NewDecoder(r.Body).Decode(&data)
+	err := json.NewDecoder(r.Body).Decode(&data)
 	if err != nil {
 		http.Error(w, "Failed to decode request", http.StatusBadRequest)
 		return
@@ -104,8 +84,7 @@ func AddSongToPlaylistHandler(w http.ResponseWriter, r *http.Request) {
 	playlistID := data["playlist_id"]
 	songID := data["song_id"]
 
-
-	_, err = db.Exec("INSERT INTO PlaylistSongs (playlist_id, song_id) VALUES (?, ?)", playlistID, songID)
+	_, err = db.Exec("INSERT INTO PlaylistSongs (playlist_id, song_id) VALUES ($1, $2)", playlistID, songID)
 	if err != nil {
 		http.Error(w, "Failed to add song to playlist", http.StatusInternalServerError)
 		log.Println(err)
@@ -116,17 +95,12 @@ func AddSongToPlaylistHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func RemoveSongFromPlaylistHandler(w http.ResponseWriter, r *http.Request) {
-	db, err := sql.Open("sqlite3", "./db/database.db")
-	if err != nil {
-		http.Error(w, "Failed to open database", http.StatusInternalServerError)
-		return
-	}
-	defer db.Close()
+	db := Database.GetDB()
 
 	playlistID := r.URL.Query().Get("playlist_id")
 	songID := r.URL.Query().Get("song_id")
 
-	_, err = db.Exec("DELETE FROM PlaylistSongs WHERE playlist_id = ? AND song_id = ?", playlistID, songID)
+	_, err := db.Exec("DELETE FROM PlaylistSongs WHERE playlist_id = $1 AND song_id = $2", playlistID, songID)
 	if err != nil {
 		http.Error(w, "Failed to remove song from playlist", http.StatusInternalServerError)
 		return
@@ -136,12 +110,7 @@ func RemoveSongFromPlaylistHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetPlaylistHandler(w http.ResponseWriter, r *http.Request) {
-	db, err := sql.Open("sqlite3", "./db/database.db")
-	if err != nil {
-		http.Error(w, "Failed to open database", http.StatusInternalServerError)
-		return
-	}
-	defer db.Close()
+	db := Database.GetDB()
 
 	id := r.URL.Query().Get("id")
 
@@ -155,7 +124,7 @@ func GetPlaylistHandler(w http.ResponseWriter, r *http.Request) {
 		INNER JOIN PlaylistSongs ps ON s.id = ps.song_id
 		INNER JOIN Albums a ON s.album = a.id
 		INNER JOIN Artists ar ON a.artist = ar.id
-		WHERE ps.playlist_id = ?`, id)
+		WHERE ps.playlist_id = $1`, id)
 	if err != nil {
 		http.Error(w, "Failed to retrieve playlist songs", http.StatusInternalServerError)
 		return
@@ -179,7 +148,7 @@ func GetPlaylistHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var playlistName, playlistCover string
-	err = db.QueryRow("SELECT name, cover FROM Playlists WHERE id = ?", id).Scan(&playlistName, &playlistCover)
+	err = db.QueryRow("SELECT name, cover FROM Playlists WHERE id = $1", id).Scan(&playlistName, &playlistCover)
 	if err != nil {
 		http.Error(w, "Failed to retrieve playlist data", http.StatusInternalServerError)
 		return
@@ -195,21 +164,16 @@ func GetPlaylistHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func EditPlaylistInfoHandler(w http.ResponseWriter, r *http.Request) {
-	db, err := sql.Open("sqlite3", "./db/database.db")
-	if err != nil {
-		http.Error(w, "Failed to open database", http.StatusInternalServerError)
-		return
-	}
-	defer db.Close()
+	db := Database.GetDB()
 
 	var playlist Playlist
-	err = json.NewDecoder(r.Body).Decode(&playlist)
+	err := json.NewDecoder(r.Body).Decode(&playlist)
 	if err != nil {
 		http.Error(w, "Failed to decode request", http.StatusBadRequest)
 		return
 	}
 
-	_, err = db.Exec("UPDATE Playlists SET name = ?, cover = ? WHERE id = ?", playlist.Name, playlist.Cover, playlist.ID)
+	_, err = db.Exec("UPDATE Playlists SET name = $1, cover = $2 WHERE id = $3", playlist.Name, playlist.Cover, playlist.ID)
 	if err != nil {
 		http.Error(w, "Failed to update playlist", http.StatusInternalServerError)
 		return

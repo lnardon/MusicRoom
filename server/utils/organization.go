@@ -9,17 +9,15 @@ import (
 	"strings"
 	"time"
 
+	Database "server/modules/database"
+
 	"github.com/bogem/id3v2"
 	"github.com/faiface/beep/mp3"
 	"github.com/google/uuid"
 )
 
 func ScanHandler(w http.ResponseWriter, r *http.Request) {
-	db, err := sql.Open("sqlite3", "./db/database.db")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer db.Close()
+	db := Database.GetDB()
 
 	files, err := GetAllFilesInPath(FOLDER_PATH)
 	if err != nil {
@@ -68,32 +66,36 @@ func ScanHandler(w http.ResponseWriter, r *http.Request) {
 			songTitle = strings.TrimSuffix(strings.Split(file, "/")[len(strings.Split(file, "/"))-1], ".mp3")
 		}
 
-		err = db.QueryRow("SELECT id FROM Artists WHERE name = ?", artistName).Scan(&artistID)
+		// Check if the artist exists, if not, insert into the Artists table
+		err = db.QueryRow("SELECT id FROM Artists WHERE name = $1", artistName).Scan(&artistID)
 		if err == sql.ErrNoRows {
 			artistID = uuid.New().String()
-			_, err = db.Exec("INSERT INTO Artists (id, name, avatar, albums) VALUES (?, ?, '', '')", artistID, artistName)
+			fmt.Println(artistID)
+			_, err = db.Exec("INSERT INTO artists (id, name, avatar, albums) VALUES ($1, $2, '', '')", artistID, artistName)
 			if err != nil {
 				log.Println("Error inserting artist:", err)
 				continue
 			}
 		}
 
-		err = db.QueryRow("SELECT id FROM Albums WHERE title = ? AND artist = ?", albumTitle, artistID).Scan(&albumID)
+		// Check if the album exists, if not, insert into the Albums table
+		err = db.QueryRow("SELECT id FROM Albums WHERE title = $1 AND artist = $2", albumTitle, artistID).Scan(&albumID)
 		if err == sql.ErrNoRows {
 			albumID = uuid.New().String()
-			_, err = db.Exec("INSERT INTO Albums (id, title, cover, release_date, artist) VALUES (?, ?, '', ?, ?)", albumID, albumTitle, releaseDate, artistID)
+			_, err = db.Exec("INSERT INTO Albums (id, title, cover, release_date, artist) VALUES ($1, $2, '', $3, $4)", albumID, albumTitle, releaseDate, artistID)
 			if err != nil {
 				log.Println("Error inserting album:", err)
 				continue
 			}
 		}
 
+		// Check if the song exists, if not, insert into the Songs table
 		var existingSongID string
 		var path string
-		err = db.QueryRow("SELECT id, path FROM Songs WHERE title = ? AND album = ?", songTitle, albumID).Scan(&existingSongID, &path)
+		err = db.QueryRow("SELECT id, path FROM Songs WHERE title = $1 AND album = $2", songTitle, albumID).Scan(&existingSongID, &path)
 		if err == sql.ErrNoRows {
 			songID := uuid.New().String()
-			_, err = db.Exec("INSERT INTO Songs (id, title, duration, track_number, release_date, path, album, lyrics) VALUES (?, ?, ?, '0', ?, ?, ?, 'N/A')", songID, songTitle, duration, releaseDate, file, albumID)
+			_, err = db.Exec("INSERT INTO Songs (id, title, duration, track_number, release_date, path, album, lyrics) VALUES ($1, $2, $3, '0', $4, $5, $6, 'N/A')", songID, songTitle, duration, releaseDate, file, albumID)
 			if err != nil {
 				log.Println("Error inserting song:", err)
 				continue
@@ -102,7 +104,7 @@ func ScanHandler(w http.ResponseWriter, r *http.Request) {
 		} else {
 			if path != file {
 				log.Println("Song path has changed, updating path...")
-				_, err = db.Exec("UPDATE Songs SET path = ? WHERE id = ?", file, existingSongID)
+				_, err = db.Exec("UPDATE Songs SET path = $1 WHERE id = $2", file, existingSongID)
 				if err != nil {
 					log.Println("Error updating song path:", err)
 					continue

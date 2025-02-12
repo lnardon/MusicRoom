@@ -193,15 +193,10 @@ func executeAlbumQuery(db *sql.DB) []Album {
 }
 
 func GetHistoryHandler(w http.ResponseWriter, r *http.Request) {
-	db, err := sql.Open("sqlite3", "./db/database.db")
-	if err != nil {
-		http.Error(w, "Failed to open database", http.StatusInternalServerError)
-		return
-	}
-	defer db.Close()
+	db := Database.GetDB()
 
 	rows, err := db.Query(`SELECT s.id, s.title, a.name AS artist_name, a.id AS artist_id,
-									al.id, al.title, s.path, s.duration, s.track_number
+								al.id, al.title, s.path, s.duration, s.track_number
 							FROM History h
 							JOIN Songs s ON h.song = s.id
 							JOIN Albums al ON s.album = al.id
