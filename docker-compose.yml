@@ -1,0 +1,40 @@
+version: "3.8"
+
+services:
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "7777:7777"
+    environment:
+      DB_HOST: db
+      DB_PORT: "5432"
+      POSTGRES_USER: musicroom
+      POSTGRES_PASSWORD: example
+      POSTGRES_DB: musicroom
+    volumes:
+      - /home/crow/Music:/Music
+    depends_on:
+      - db
+
+  db:
+    image: postgres:15
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: musicroom
+      POSTGRES_PASSWORD: example
+      POSTGRES_DB: musicroom
+    ports:
+      - "5445:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+      - ./server/db:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  db_data:
