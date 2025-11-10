@@ -96,7 +96,7 @@ func HandleSignUp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	expirationTime := time.Now().Add(2520 * time.Minute)
+	expirationTime := time.Now().Add(1440 * time.Minute)
 	claims := &Claims{
 		ID: id,
 		RegisteredClaims: jwt.RegisteredClaims{
