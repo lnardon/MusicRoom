@@ -9,3 +9,6 @@ dev-run-fe:
 
 dev-run-be:
 	nodemon --watch server --ext go --exec "cd ./server && go build ./*.go && ./main" --signal SIGTERM
+
+docker-run:
+	docker-compose -f docker-compose.yml up --build
