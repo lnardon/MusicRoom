@@ -156,20 +156,35 @@ func executeArtistQuery(db *sql.DB) []Artist {
 
 func executeAlbumQuery(db *sql.DB) []Album {
 	query := `
-        SELECT a.id, a.title, a.cover, a.release_date, art.id, art.name, art.avatar, COALESCE(SUM(top_songs.plays), 0) as plays
-        FROM Albums a
-        JOIN Artists art ON a.artist = art.id
-        JOIN Songs s ON a.id = s.album
-        LEFT JOIN (
-            SELECT song, COUNT(*) as plays
-            FROM History
-            WHERE timestamp >= NOW() - INTERVAL '30 days'
-            GROUP BY song
-        ) as top_songs ON s.id = top_songs.song
-        GROUP BY a.id
-        ORDER BY plays DESC
-        LIMIT 5;
-    `
+		SELECT 
+		    a.id, 
+		    a.title, 
+		    a.cover, 
+		    a.release_date, 
+		    art.id AS artist_id, 
+		    art.name AS artist_name, 
+		    art.avatar AS artist_avatar, 
+		    COALESCE(SUM(top_songs.plays), 0) AS plays
+		FROM Albums a
+		JOIN Artists art ON a.artist = art.id
+		JOIN Songs s ON a.id = s.album
+		LEFT JOIN (
+		    SELECT song, COUNT(*) AS plays
+		    FROM History
+		    WHERE timestamp >= NOW() - INTERVAL '30 days'
+		    GROUP BY song
+		) AS top_songs ON s.id = top_songs.song
+		GROUP BY 
+		    a.id, 
+		    a.title, 
+		    a.cover, 
+		    a.release_date, 
+		    art.id, 
+		    art.name, 
+		    art.avatar
+		ORDER BY plays DESC
+		LIMIT 5;
+	`
 
 	rows, err := db.Query(query)
 	if err != nil {
@@ -216,7 +231,7 @@ func GetHistoryHandler(w http.ResponseWriter, r *http.Request) {
 	for rows.Next() {
 		var song Types.Song
 
-		if err := rows.Scan(&song.ID, &song.Title, &song.Artist.Name, &song.Artist.ID, &song.Album.ID, &song.Album.Name, &song.Path, &song.Duration, &song.TrackNumber); err != nil {
+		if err := rows.Scan(&song.ID, &song.Title, &song.Artist.Name, &song.Artist.ID, &song.Album.ID, &song.Album.Title, &song.Path, &song.Duration, &song.TrackNumber); err != nil {
 			http.Error(w, "Failed to scan row", http.StatusInternalServerError)
 			log.Printf("Error scanning row: %v", err)
 			return
@@ -228,7 +243,7 @@ func GetHistoryHandler(w http.ResponseWriter, r *http.Request) {
 		if _, exists := albumsMap[auxId]; !exists {
 			albumsMap[auxId] = Types.Album{
 				ID:          auxId,
-				Title:       song.Album.Name,
+				Title:       song.Album.Title,
 				Cover:       "",
 				ReleaseDate: "",
 				Artist: Types.SimpleArtistInfo{
