@@ -3,6 +3,7 @@ package artist
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 	"strings"
 
 	_ "github.com/lib/pq"
@@ -14,7 +15,7 @@ import (
 func GetAllArtistsHandler(w http.ResponseWriter, r *http.Request) {
 	db := Database.GetDB()
 
-	rows, err := db.Query("SELECT id, name FROM Artists")
+	rows, err := db.Query("SELECT id, name FROM Artists ORDER BY name ASC")
 	if err != nil {
 		http.Error(w, "Failed to query database", http.StatusInternalServerError)
 		return
@@ -76,7 +77,7 @@ func GetArtistHandler(w http.ResponseWriter, r *http.Request) {
 	if len(albumIDs) > 0 {
 		placeholders := make([]string, len(albumIDs))
 		for i := range placeholders {
-			placeholders[i] = "$" + string(rune(i+1))
+			placeholders[i] = "$" + strconv.Itoa(i+1)
 		}
 		placeholdersStr := strings.Join(placeholders, ",")
 		query := `SELECT s.id, s.title, s.duration, s.track_number, a.id, a.name, al.id, al.title FROM Songs s 
@@ -98,7 +99,7 @@ func GetArtistHandler(w http.ResponseWriter, r *http.Request) {
 
 		for songsRows.Next() {
 			var song Types.Song
-			if err := songsRows.Scan(&song.ID, &song.Title, &song.Duration, &song.TrackNumber, &song.Artist.ID, &song.Artist.Name, &song.Album.ID, &song.Album.Name); err != nil {
+			if err := songsRows.Scan(&song.ID, &song.Title, &song.Duration, &song.TrackNumber, &song.Artist.ID, &song.Artist.Name, &song.Album.ID, &song.Album.Title); err != nil {
 				http.Error(w, "Error scanning songs", http.StatusInternalServerError)
 				return
 			}
