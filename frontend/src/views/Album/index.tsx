@@ -5,7 +5,7 @@ import { Track } from "../../types";
 import { HandleFallbackImage } from "../../utils/helpers";
 import { apiHandler } from "../../utils/apiHandler";
 import SongTableCell from "../../Components/SongTableCell";
-import { useHandleOpenArtist } from "../../utils/hooks";
+import { useHandleOpenArtist, useHandlePlaySong } from "../../utils/hooks";
 import styles from "./styles.module.css";
 
 const Album: React.FC = () => {
@@ -14,42 +14,14 @@ const Album: React.FC = () => {
   const [cover, setCover] = useState("");
   const [tracks, setTracks] = useState<Track[]>([]);
 
-  const handleOpenArtist = useHandleOpenArtist()
+  const handlePlaySong = useHandlePlaySong();
+  const handleOpenArtist = useHandleOpenArtist();
 
-  const { setSong, setIsPlaying, setQueue, isShuffled, freq1, freq2 } =
-    usePlayerStore();
+  const { freq1, freq2 } = usePlayerStore();
   const coverRef = useRef<HTMLImageElement>(null);
-  const albumId = new URLSearchParams(window.location.search).get("album") || "";
+  const albumId =
+    new URLSearchParams(window.location.search).get("album") || "";
   const lerp = (a: number, b: number, t: number) => a + t * (b - a);
-
-  function handlePlay(track: Track) {
-    const newQueue = isShuffled
-      ? [...tracks]
-          .sort(() => Math.random() - 0.5)
-          .map((t) => ({
-            title: t.title,
-            artist: artist,
-            cover: `/api/getCover?file=${albumId}`,
-            file: `/api/getSong?file=${t.id}`,
-          }))
-      : tracks
-          .slice(tracks.findIndex((t) => t.title === track.title) + 1)
-          .map((t) => ({
-            title: t.title,
-            artist: artist,
-            cover: `/api/getCover?file=${albumId}`,
-            file: `/api/getSong?file=${t.id}`,
-          }));
-
-    setQueue(newQueue);
-    setSong({
-      title: track.title,
-      artist: artist,
-      cover: `/api/getCover?file=${albumId}`,
-      file: `/api/getSong?file=${track.id}`,
-    });
-    setIsPlaying(true);
-  }
 
   useEffect(() => {
     document.title = albumName || "Album";
@@ -115,9 +87,9 @@ const Album: React.FC = () => {
         <div className={styles.tracksContainer}>
           {tracks.map((track, index) => (
             <SongTableCell
-            index={index}
-            track={track}
-            handleClick={() => handlePlay(track)}
+              index={index}
+              track={track}
+              handleClick={() => handlePlaySong(track)}
             />
           ))}
         </div>
