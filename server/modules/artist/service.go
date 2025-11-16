@@ -3,8 +3,8 @@ package artist
 import (
 	"encoding/json"
 	"net/http"
-	"strconv"
 	"strings"
+	"strconv"
 
 	_ "github.com/lib/pq"
 
@@ -15,7 +15,7 @@ import (
 func GetAllArtistsHandler(w http.ResponseWriter, r *http.Request) {
 	db := Database.GetDB()
 
-	rows, err := db.Query("SELECT id, name FROM Artists ORDER BY name ASC")
+	rows, err := db.Query("SELECT id, name FROM Artists")
 	if err != nil {
 		http.Error(w, "Failed to query database", http.StatusInternalServerError)
 		return
