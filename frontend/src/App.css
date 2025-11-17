@@ -6,12 +6,6 @@
   --yellow-primary: #ffd000;
 }
 
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
 .views {
   display: flex;
   flex-direction: row;
