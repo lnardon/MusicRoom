@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import AlbumCard from "../../Components/AlbumCard";
+import AlbumCard from "@/components/AlbumCard";
 import SongTableCell from "../../Components/SongTableCell";
 import { Track, Album } from "../../types";
 import { apiHandler } from "../../utils/apiHandler";

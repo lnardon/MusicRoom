@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import AnimatedText from "animated-text-letters";
 import { apiHandler } from "../../utils/apiHandler";
-import AlbumCard from "../../Components/AlbumCard";
+import AlbumCard from "@/components/AlbumCard";
 import SongTableCell from "../../Components/SongTableCell";
 import { useHandlePlaySong, useHandleOpenAlbum } from "../../utils/hooks";
 import { Album, Track } from "../../types";
@@ -15,8 +15,8 @@ const ArtistProfile: React.FC = () => {
     songs: [],
   });
 
-  const handlePlaySong = useHandlePlaySong()
-  const handleOpenAlbum = useHandleOpenAlbum()
+  const handlePlaySong = useHandlePlaySong();
+  const handleOpenAlbum = useHandleOpenAlbum();
 
   useEffect(() => {
     document.title = info.name || "Artist Profile";
@@ -49,9 +49,9 @@ const ArtistProfile: React.FC = () => {
         </div>
         {info.songs.map((song: Track, index: number) => (
           <SongTableCell
-           index={index}
-           track={song}
-           handleClick={() => handlePlaySong(song)}
+            index={index}
+            track={song}
+            handleClick={() => handlePlaySong(song)}
           />
         ))}
       </div>

@@ -1,6 +1,5 @@
-import { Album } from "../../types";
-import { HandleFallbackImage } from "../../utils/helpers";
-import styles from "./styles.module.css";
+import { Album } from "@/types";
+import { HandleFallbackImage } from "@/utils/helpers";
 
 const AlbumCard = ({
   album,
@@ -13,10 +12,10 @@ const AlbumCard = ({
 }) => {
   return (
     <div
-      className={styles.container}
+      className="w-full p-1 rounded-sm cursor-pointer flex flex-col items-start shadow-md opacity-0 animate-slide-up"
       key={album.id}
       style={{
-        animationDelay: `${index * 0.08}s`,
+        animationDelay: `${index * 25}ms`,
       }}
       onClick={onClick}
     >
@@ -26,7 +25,9 @@ const AlbumCard = ({
         borderRadius: "0.25rem",
         marginBottom: "0.5rem",
       })}
-      <p className={styles.title}>{album.title}</p>
+      <p className="w-full text-start text-[1rem] font-medium text-white">
+        {album.title}
+      </p>
     </div>
   );
 };
