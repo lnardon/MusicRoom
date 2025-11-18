@@ -1,17 +1,20 @@
 package album
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"os"
-
-	_ "github.com/lib/pq"
+	"strings"
+	"time"
 
 	Database "server/modules/database"
 	Types "server/types"
 
 	"github.com/bogem/id3v2"
+	_ "github.com/lib/pq"
 )
 
 func GetAllAlbumsHandler(w http.ResponseWriter, r *http.Request) {
@@ -105,13 +108,13 @@ func GetCoverHandler(w http.ResponseWriter, r *http.Request) {
 
 	coverPath := fmt.Sprintf("./album_covers/cover_%s.jpg", albumName)
 	if _, err := os.Stat(coverPath); os.IsNotExist(err) {
-		findAndServeAlbumCoverFromDB(w, albumName)
+		findAndServeAlbumCoverFromDB(w, r, albumName)
 	} else {
-		http.ServeFile(w, r, coverPath)
+		serveCoverFileWithETag(w, r, coverPath, file)
 	}
 }
 
-func findAndServeAlbumCoverFromDB(w http.ResponseWriter, albumName string) {
+func findAndServeAlbumCoverFromDB(w http.ResponseWriter, r *http.Request, albumName string) {
 	db := Database.GetDB()
 	var songPath string
 
@@ -131,11 +134,67 @@ func findAndServeAlbumCoverFromDB(w http.ResponseWriter, albumName string) {
 	frames := tag.GetFrames(tag.CommonID("Attached picture"))
 	for _, f := range frames {
 		if pic, ok := f.(id3v2.PictureFrame); ok {
+			hash := sha256.Sum256(pic.Picture)
+			etag := fmt.Sprintf(`"%s"`, hex.EncodeToString(hash[:16])) // Use first 16 bytes for shorter ETag
+
+			if ifNoneMatch := r.Header.Get("If-None-Match"); ifNoneMatch != "" {
+				etagValue := strings.Trim(etag, `"`)
+				for _, match := range strings.Split(ifNoneMatch, ",") {
+					match = strings.TrimSpace(match)
+					match = strings.Trim(match, `"`)
+					if match == etagValue {
+						w.WriteHeader(http.StatusNotModified)
+						return
+					}
+				}
+			}
+
 			w.Header().Set("Content-Type", "image/jpeg")
+			w.Header().Set("ETag", etag)
+			w.Header().Set("Cache-Control", "public, max-age=31536000") // 1 year
 			w.Write(pic.Picture)
 			return
 		}
 	}
 
 	http.Error(w, "No cover found in ID3 metadata", http.StatusNotFound)
+}
+
+func serveCoverFileWithETag(w http.ResponseWriter, r *http.Request, coverPath string, albumID string) {
+	fileInfo, err := os.Stat(coverPath)
+	if err != nil {
+		http.Error(w, "Error reading cover file", http.StatusInternalServerError)
+		return
+	}
+
+	etagData := fmt.Sprintf("%s-%d-%d", albumID, fileInfo.ModTime().Unix(), fileInfo.Size())
+	hash := sha256.Sum256([]byte(etagData))
+	etag := fmt.Sprintf(`"%s"`, hex.EncodeToString(hash[:16])) // Use first 16 bytes for shorter ETag
+
+	if ifNoneMatch := r.Header.Get("If-None-Match"); ifNoneMatch != "" {
+		etagValue := strings.Trim(etag, `"`)
+		for _, match := range strings.Split(ifNoneMatch, ",") {
+			match = strings.TrimSpace(match)
+			match = strings.Trim(match, `"`)
+			if match == etagValue {
+				w.WriteHeader(http.StatusNotModified)
+				return
+			}
+		}
+	}
+
+	w.Header().Set("ETag", etag)
+	w.Header().Set("Cache-Control", "public, max-age=31536000") // 1 year
+	w.Header().Set("Last-Modified", fileInfo.ModTime().Format(time.RFC1123))
+
+	if ifModifiedSince := r.Header.Get("If-Modified-Since"); ifModifiedSince != "" {
+		if t, err := time.Parse(time.RFC1123, ifModifiedSince); err == nil {
+			if fileInfo.ModTime().Before(t.Add(time.Second)) {
+				w.WriteHeader(http.StatusNotModified)
+				return
+			}
+		}
+	}
+
+	http.ServeFile(w, r, coverPath)
 }
