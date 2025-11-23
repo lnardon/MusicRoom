@@ -88,8 +88,20 @@ const Album: React.FC = () => {
           {tracks.map((track, index) => (
             <SongTableCell
               index={index}
-              track={track}
-              handleClick={() => handlePlaySong(track)}
+              track={{
+                ...track,
+                artist: artist,
+              }}
+              handleClick={() =>
+                handlePlaySong({
+                  ...track,
+                  artist: artist,
+                  album: {
+                    id: albumId,
+                    title: albumName,
+                  },
+                })
+              }
             />
           ))}
         </div>
