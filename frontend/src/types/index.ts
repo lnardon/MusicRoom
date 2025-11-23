@@ -3,7 +3,7 @@ export interface Track {
   title: string;
   artist: Artist;
   cover: string;
-  album: string;
+  album: Partial<Album>;
   file: string;
   duration: string;
 }
