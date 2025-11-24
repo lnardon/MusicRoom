@@ -88,6 +88,7 @@ const Album: React.FC = () => {
           {tracks.map((track, index) => (
             <SongTableCell
               index={index}
+              hideCover={true}
               track={{
                 ...track,
                 artist: artist,
