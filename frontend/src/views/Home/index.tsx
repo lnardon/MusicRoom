@@ -5,16 +5,20 @@ import { Track, Album } from "../../types";
 import { apiHandler } from "../../utils/apiHandler";
 import styles from "./styles.module.css";
 import { useHandleOpenAlbum, useHandlePlaySong } from "../../utils/hooks";
+import AlbumCardSkeleton from "@/components/AlbumCardSkeleton";
+import SongTableCellSkeleton from "@/components/SongTableCellSkeleton";
 
 const Home: React.FC = () => {
   const [recentlyPlayed, setRecentlyPlayed] = useState([]);
   const [lastAlbums, setLastAlbums] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const handlePlaySong = useHandlePlaySong();
   const handleOpenAlbum = useHandleOpenAlbum();
 
   useEffect(() => {
-    apiHandler("/api/getHistory", "GET", "", {})
+    setLoading(true);
+    apiHandler("/api/getHistory", "GET")
       .then((res) => res.json())
       .then((data) => {
         setRecentlyPlayed(data.songs);
@@ -22,6 +26,9 @@ const Home: React.FC = () => {
       })
       .catch((err) => {
         console.error(err);
+      })
+      .finally(() => {
+        setLoading(false);
       });
   }, []);
 
@@ -30,27 +37,35 @@ const Home: React.FC = () => {
       <div className={styles.albumsContainer}>
         <h3 className={styles.subtitle}>Last Albums:</h3>
         <div className={styles.albums}>
-          {lastAlbums.map((album: Album, index: number) => (
-            <AlbumCard
-              key={album.id}
-              onClick={() => handleOpenAlbum(album)}
-              album={album}
-              index={index}
-            />
-          ))}
+          {loading
+            ? Array.from({ length: 8 }).map((_, index) => (
+                <AlbumCardSkeleton key={index} index={index} />
+              ))
+            : lastAlbums.map((album: Album, index: number) => (
+                <AlbumCard
+                  key={album.id}
+                  onClick={() => handleOpenAlbum(album)}
+                  album={album}
+                  index={index}
+                />
+              ))}
         </div>
       </div>
 
       <h4 className={styles.subtitle}>Recently Played:</h4>
       <div className={styles.tracksContainer}>
-        {recentlyPlayed?.map((track: Track, index: number) => (
-          <SongTableCell
-            key={track.id}
-            track={track}
-            index={index}
-            handleClick={handlePlaySong}
-          />
-        ))}
+        {loading
+          ? Array.from({ length: 10 }).map((_, index) => (
+             <SongTableCellSkeleton key={index} index={index} />
+            ))
+          : recentlyPlayed?.map((track: Track, index: number) => (
+              <SongTableCell
+                key={track.id}
+                track={track}
+                index={index}
+                handleClick={handlePlaySong}
+              />
+            ))}
       </div>
     </div>
   );
