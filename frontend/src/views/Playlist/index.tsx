@@ -6,88 +6,55 @@ import { usePlayerStore } from "../../stores/playerStore";
 import { Pen, Shuffle } from "lucide-react";
 import SongTableCell from "../../Components/SongTableCell";
 import { apiHandler } from "../../utils/apiHandler";
+import { useHandlePlaySong } from "@/utils/hooks";
+import { Track } from "@/types";
 
 interface PlaylistInterface {
   id: string;
   name: string;
   description: string;
   cover: string;
-  songs: {
-    id: string;
-    title: string;
-    artist_name: string;
-    artist_id: string;
-    album_title: string;
-    album_id: string;
-  }[];
+  songs: Track[];
 }
 
 const Playlist: React.FC = () => {
   const [playlist, setPlaylist] = useState<PlaylistInterface>(
-    {} as PlaylistInterface
+    {} as PlaylistInterface,
   );
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [name, setName] = useState("");
   const [cover, setCover] = useState("");
   const [description, setDescription] = useState("");
 
-  const { setSong, setIsPlaying, setQueue } = usePlayerStore();
+  const { setQueue } = usePlayerStore();
+  const handlePlaySong = useHandlePlaySong();
 
   function handleClick(track: any) {
-    setSong({
-      id: track.id,
-      title: track.title,
-      artist: {
-        name: track.artist_name,
-        id: track.artist_id,
-      },
-      cover: `/api/getCover?file=${track.album_id}`,
-      file: `/api/getSong?file=${track.id}`,
-    });
-    setIsPlaying(true);
+    handlePlaySong(track);
+    setQueue(playlist.songs);
   }
 
   function handleShuffle() {
     const shuffledQueue = [...playlist.songs];
     shuffledQueue.sort(() => Math.random() - 0.5);
-    setSong({
-      id: shuffledQueue[0].id,
-      title: shuffledQueue[0].title,
-      artist: {
-        name: shuffledQueue[0].artist_name,
-        id: shuffledQueue[0].artist_id,
-      },
-      cover: `/api/getCover?file=${shuffledQueue[0].album_id}`,
-      file: `/api/getSong?file=${shuffledQueue[0].id}`,
-    });
-    setIsPlaying(true);
-    setQueue(
-      shuffledQueue.map((song) => ({
-        id: song.id,
-        title: song.title,
-        artist: {
-          name: song.artist_name,
-          id: song.artist_id,
-        },
-        cover: `/api/getCover?file=${song.album_id}`,
-        file: `/api/getSong?file=${song.id}`,
-      }))
-    );
+    handlePlaySong(shuffledQueue.shift() as Track);
+    setQueue(shuffledQueue);
   }
 
   function handleSaveEdit() {
     apiHandler("/api/editPlaylist", "POST", "application/json", {
-        id: playlist.id,
-        name,
-        cover,
-        description,
+      id: playlist.id,
+      name,
+      cover,
+      description,
     }).then((res) => {
       if (res.status === 200) {
         setIsModalOpen(false);
         apiHandler(
           `/api/getPlaylist?id=${
             new URLSearchParams(window.location.search).get("playlist") || ""
-          }`, "GET"
+          }`,
+          "GET",
         )
           .then((response) => response.json())
           .then((data) => {
@@ -101,7 +68,8 @@ const Playlist: React.FC = () => {
     apiHandler(
       `/api/getPlaylist?id=${
         new URLSearchParams(window.location.search).get("playlist") || ""
-      }`, "GET"
+      }`,
+      "GET",
     )
       .then((response) => response.json())
       .then((data) => {
@@ -130,9 +98,9 @@ const Playlist: React.FC = () => {
               animation="slide-up"
               transitionOnlyDifferentLetters={true}
               style={{
-                display: 'flex',
-                alignItems: 'flex-start',
-                flexWrap: 'wrap'
+                display: "flex",
+                alignItems: "flex-start",
+                flexWrap: "wrap",
               }}
             />
           </h1>
@@ -154,26 +122,10 @@ const Playlist: React.FC = () => {
       {
         <div className={styles.playlist}>
           {playlist?.songs?.map((song1, index) => (
-            <SongTableCell 
-              track={
-                {
-                  id: song1.id,
-                  title: song1.title,
-                  artist: {
-                    id : song1.artist_id,
-                    name: song1.artist_name
-                  },
-                  cover: song1.album_id,
-                  file: song1.id,
-                  album: song1.album_id,
-                  duration: ""
-                }
-              }
+            <SongTableCell
+              track={song1}
               index={index}
-              handleClick={
-                  () => handleClick(song1)
-              }
-              
+              handleClick={() => handleClick(song1)}
             />
           ))}
         </div>
