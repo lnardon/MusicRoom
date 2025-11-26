@@ -7,19 +7,21 @@ import {
   Dices,
   SkipForward,
   SkipBack,
-  // MicVocal,
+  Volume2,
 } from "lucide-react";
 import "animated-text-letters/index.css";
 import { usePlayerStore } from "../../stores/playerStore";
 import { useAudioAnalyser } from "./analyser";
 import { HandleFallbackImage } from "../../utils/helpers";
-import {useHandleOpenArtist} from "../../utils/hooks"
+import { useHandleOpenArtist, useHandlePlaySong } from "../../utils/hooks";
 import styles from "./styles.module.css";
+import { Track } from "../../types";
 
 const Player: React.FC = () => {
+  const [progress, setProgress] = useState<number>(0);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   const {
     song: { title, artist, cover, file },
-    setSong,
     isPlaying,
     setIsPlaying,
     isRepeating,
@@ -32,11 +34,10 @@ const Player: React.FC = () => {
     setFreq1,
     setFreq2,
   } = usePlayerStore();
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  const analyser = useAudioAnalyser(audioRef, isPlaying);
-  const [progress, setProgress] = useState<number>(0);
+  const handleOpenArtist = useHandleOpenArtist();
+  const handlePlaySong = useHandlePlaySong();
 
-  const handleOpenArtist = useHandleOpenArtist()
+  const analyser = useAudioAnalyser(audioRef, isPlaying);
 
   const handlePlayPause = (): void => {
     const audio = audioRef.current;
@@ -48,6 +49,16 @@ const Player: React.FC = () => {
       }
       setIsPlaying(!audio.paused);
     }
+  };
+
+  const handleNextSong = () => {
+    if (queue.length > 0) {
+      const nextSong = queue.shift();
+      handlePlaySong(nextSong as Track);
+      setQueue(queue);
+      return;
+    }
+    setIsPlaying(false);
   };
 
   useEffect(() => {
@@ -64,16 +75,7 @@ const Player: React.FC = () => {
     if (audioElem) {
       audioElem.addEventListener("timeupdate", handleTimeUpdate);
       audioElem.addEventListener("ended", () => {
-        if (queue.length > 0) {
-          const nextSong = queue.shift();
-          setSong(nextSong!);
-          setQueue(queue);
-          audioElem.play();
-          setIsPlaying(true);
-          return;
-        }
-
-        setIsPlaying(false);
+        handleNextSong();
       });
     }
 
@@ -92,7 +94,7 @@ const Player: React.FC = () => {
   }, [audioRef, queue]);
 
   const handleTimelineClick = (
-    event: React.MouseEvent<HTMLDivElement>
+    event: React.MouseEvent<HTMLDivElement>,
   ): void => {
     const timeline = event.currentTarget;
     const rect = timeline.getBoundingClientRect();
@@ -178,16 +180,7 @@ const Player: React.FC = () => {
             {isPlaying ? <Pause size={28} /> : <Play size={28} />}
           </button>
           <button>
-            <SkipForward
-              onClick={() => {
-                if (queue.length > 0) {
-                  const nextSong = queue.shift();
-                  setSong(nextSong!);
-                  setQueue(queue);
-                  setIsPlaying(true);
-                }
-              }}
-            />
+            <SkipForward onClick={handleNextSong} />
           </button>
           <button>
             <Dices
@@ -240,43 +233,7 @@ const Player: React.FC = () => {
       </div>
 
       <div className={styles.volume}>
-        {/* <MicVocal
-          size={20}
-          strokeWidth={2}
-          style={{
-            cursor: "pointer",
-          }}
-          color={
-            window.location.search.includes("view=lyrics")
-              ? "#ffd000"
-              : "rgba(255, 255, 255, 0.8)"
-          }
-          onClick={() => {
-            const searchParams = new URLSearchParams(window.location.search);
-            if (searchParams.get("view") === "lyrics") {
-              searchParams.delete("view");
-              window.history.pushState(
-                {},
-                "",
-                `${window.location.pathname}?${searchParams.toString()}`
-              );
-              setUrl(window.location.search);
-              return;
-            }
-
-            urlHistoryHandler("view", "lyrics", setUrl);
-          }}
-        /> */}
-
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          fill="rgba(255, 255, 255, 0.8)"
-          width="24px"
-          height="24px"
-        >
-          <path d="M7 9v6h4l5 5V4l-5 5H7z" />
-        </svg>
+        <Volume2 size={20} color="white" />
         <input
           type="range"
           min="0"

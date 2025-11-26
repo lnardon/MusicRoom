@@ -137,7 +137,7 @@ audio {
 }
 
 .volume > input {
-  width: 8em;
+  width: 6em;
   height: 0.5rem;
   border-radius: 0.25rem;
   outline: none;
