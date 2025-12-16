@@ -12,7 +12,7 @@ const AlbumCard = ({
 }) => {
   return (
     <div
-      className="w-full p-1 rounded-sm cursor-pointer flex flex-col items-start shadow-md opacity-0 animate-slide-up"
+      className="w-full bg-[#040408] p-2 rounded-sm cursor-pointer flex flex-col items-start shadow-md opacity-0 animate-slide-up"
       key={album.id}
       style={{
         animationDelay: `${index * 25}ms`,
